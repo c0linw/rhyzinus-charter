@@ -1,0 +1,157 @@
+extends Control
+
+var notes: Array = [] # Array of lower or side note entities
+var timing_points: Array = [] # Array of timing point entities 
+var pixels_per_second = 512 # determines "vertical" scale of chart display
+var note_height = 32
+var base_lane_width = 64
+
+class TimeSorter:
+	static func sort_ascending(a: Dictionary, b: Dictionary) -> bool:
+		return a.time < b.time
+			
+	static func sort_notes_ascending(a: Dictionary, b: Dictionary) -> bool:
+		if a.time < b.time:
+			return true
+		elif a.time == b.time:
+			return a.lane < b.lane # floor notes come before upper notes, guarantees the upper notes draw over them
+		else:
+			return false
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	for i in range(0, 8):
+		var new = {
+			"time": i * 0.5,
+			"lane": i,
+			"beat": i * 1,
+			"type": "tap"
+		}
+		notes.append(new)
+		
+	for i in range(10,14):
+		var new = {
+			"time": (i-10) * 1,
+			"lane": i,
+			"beat": (i-10) * 2,
+			"type": "tap"
+		}
+		notes.append(new)
+		
+	timing_points.append({
+		"time": 0,
+		"beat_length": 500,
+		"meter": 4,
+		"type": "bpm"
+	})
+		
+	notes.sort_custom(TimeSorter, "sort_notes_ascending")
+	timing_points.sort_custom(TimeSorter, "sort_ascending")
+	update()
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#	pass
+
+func _draw():
+	var latest_note = 0 if len(notes) == 0 else (notes[len(notes)-1].time+2) * pixels_per_second
+	var latest_timing_point = 0 if len(timing_points) == 0 else (timing_points[len(timing_points)-1].time+2) * pixels_per_second
+
+	var new_height = max(latest_note, latest_timing_point)
+	rect_min_size = Vector2(rect_min_size.x, new_height)
+	
+	# draw lane divisions
+	draw_rect(Rect2(base_lane_width-3, 0, 4, new_height), Color(0.4, 0.4, 0.4, 1))
+		
+	for i in range(2, 4):
+		var divider_rect: Rect2 = Rect2(base_lane_width*i-1, 0, 2, new_height)
+		draw_rect(divider_rect, Color(0.4, 0.4, 0.4, 1))
+		
+	draw_rect(Rect2(base_lane_width*4-2, 0, 4, new_height), Color(0.4, 0.4, 0.4, 1))
+		
+	for i in range(5, 7):
+		var divider_rect: Rect2 = Rect2(base_lane_width*i-1, 0, 2, new_height)
+		draw_rect(divider_rect, Color(0.4, 0.4, 0.4, 1))
+		
+	draw_rect(Rect2(base_lane_width*7-1, 0, 4, new_height), Color(0.4, 0.4, 0.4, 1))
+	
+	# draw beat lines
+	var beats = generate_beats()
+	for beat in beats:
+		var thickness = 4 if beat.beat == 1 else 2
+		var line_color = Color(0.75, 0.75, 0.75) if beat.beat == 1 else Color(0.5, 0.5, 0.5)
+		var line_rect: Rect2 = Rect2(0, new_height-beat.time*pixels_per_second-(thickness-1), rect_size.x, thickness)
+		draw_rect(line_rect, line_color)
+	
+	# draw bpm changes
+	for timing_point in timing_points:
+		var line_rect: Rect2 = Rect2(0, new_height-timing_point.time*pixels_per_second-4, rect_size.x, 4)
+		draw_rect(line_rect, Color(1, 0, 0, 1))
+	
+	# draw notes
+	for note in notes:
+		# normal notes
+		if note.lane > 0 and note.lane < 7:
+			var x = note.lane*base_lane_width
+			var y = new_height - note.time*pixels_per_second - note_height
+			var note_rect: Rect2 = Rect2(x, y, base_lane_width, note_height)
+			draw_rect(note_rect, Color(1,1,1,1))
+			
+		# side notes
+		if note.lane == 0 || note.lane == 7:
+			var x = note.lane*base_lane_width
+			var y = new_height - note.time*pixels_per_second - note_height
+			var note_rect: Rect2 = Rect2(x, y, base_lane_width, note_height)
+			draw_rect(note_rect, Color(1,1,0.1,1))
+		
+		# upper notes
+		elif note.lane >= 10 and note.lane <= 13:
+			var x = base_lane_width + (note.lane-10)*base_lane_width*1.5
+			var y = new_height - note.time*pixels_per_second - note_height
+			var note_rect: Rect2 = Rect2(x, y, base_lane_width*1.5, note_height)
+			draw_rect(note_rect, Color(0.13,0.25,1,0.5))
+			
+func generate_beats():
+	var data: Array = timing_points.duplicate()
+	data.sort_custom(TimeSorter, "sort_ascending")
+	var beat_output: Array = []
+	var timestamp: float = data[0]["time"]
+	var beat_length: float = data[0].beat_length / 1000.0
+	var meter: int = data[0]["meter"]
+	var measure: int = 1
+	var beat = 1
+	beat_output.append({
+			"time": timestamp,
+			"measure": measure,
+			"beat": beat
+		})
+	var index: int = 0
+	# use either the last note or the last timing point's time
+	var end_time: float = max(data[len(data)-1]["time"], notes[len(notes)-1]["time"]) + 2
+	while timestamp <= end_time:
+		if beat % meter == 0:
+			measure += 1
+			beat = 0
+		var next_beat_time: float = timestamp + beat_length
+		if index+1 < len(data) && data[index+1]["type"] == "bpm" && next_beat_time >= data[index+1]:
+			timestamp = data[index+1]["time"]
+			beat_length = data[index+1]["beat_length"]
+			meter = data[index+1]["meter"]
+			beat = 0
+			index += 1
+		else:
+			timestamp = next_beat_time
+			beat += 1
+			index += 1
+		beat_output.append({
+			"time": timestamp,
+			"measure": measure,
+			"beat": beat
+		})
+	return beat_output
+
+
+func _on_Chart_gui_input(event):
+	if event is InputEventMouseButton:
+		print("ui input")
