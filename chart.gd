@@ -6,6 +6,8 @@ var pixels_per_second = 512 # determines "vertical" scale of chart display
 var note_height = 32
 var base_lane_width = 64
 
+var ObjNote = preload("res://note.tscn")
+
 class TimeSorter:
 	static func sort_ascending(a: Dictionary, b: Dictionary) -> bool:
 		return a.time < b.time
@@ -22,22 +24,20 @@ class TimeSorter:
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	for i in range(0, 8):
-		var new = {
-			"time": i * 0.5,
+		var note_data: Dictionary = {
+			"time": i*0.5,
 			"lane": i,
-			"beat": i * 1,
 			"type": "tap"
 		}
-		notes.append(new)
+		add_note(note_data)
 		
 	for i in range(10,14):
-		var new = {
-			"time": (i-10) * 1,
+		var note_data: Dictionary = {
+			"time": i-10,
 			"lane": i,
-			"beat": (i-10) * 2,
 			"type": "tap"
 		}
-		notes.append(new)
+		add_note(note_data)
 		
 	timing_points.append({
 		"time": 0,
@@ -48,7 +48,24 @@ func _ready():
 		
 	notes.sort_custom(TimeSorter, "sort_notes_ascending")
 	timing_points.sort_custom(TimeSorter, "sort_ascending")
+	
+	var latest_note = 0 if len(notes) == 0 else (notes[len(notes)-1].time+2) * pixels_per_second
+	var latest_timing_point = 0 if len(timing_points) == 0 else (timing_points[len(timing_points)-1].time+2) * pixels_per_second
+
+	var new_height = max(latest_note, latest_timing_point)
+	rect_min_size = Vector2(rect_min_size.x, new_height)
+	
 	update()
+	for note in notes:
+		if note.lane >= 0 and note.lane <= 7:
+			var x = note.lane*base_lane_width
+			var y = new_height - note.time*pixels_per_second - note_height
+			note.set_position(Vector2(x,y))
+		elif note.lane >= 10 and note.lane <= 13:			
+			var x = base_lane_width + (note.lane-10)*base_lane_width*1.5
+			var y = new_height - note.time*pixels_per_second - note_height
+			note.set_position(Vector2(x,y))
+		print(note.rect_position, note.rect_size)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
@@ -88,29 +105,6 @@ func _draw():
 	for timing_point in timing_points:
 		var line_rect: Rect2 = Rect2(0, new_height-timing_point.time*pixels_per_second-4, rect_size.x, 4)
 		draw_rect(line_rect, Color(1, 0, 0, 1))
-	
-	# draw notes
-	for note in notes:
-		# normal notes
-		if note.lane > 0 and note.lane < 7:
-			var x = note.lane*base_lane_width
-			var y = new_height - note.time*pixels_per_second - note_height
-			var note_rect: Rect2 = Rect2(x, y, base_lane_width, note_height)
-			draw_rect(note_rect, Color(1,1,1,1))
-			
-		# side notes
-		if note.lane == 0 || note.lane == 7:
-			var x = note.lane*base_lane_width
-			var y = new_height - note.time*pixels_per_second - note_height
-			var note_rect: Rect2 = Rect2(x, y, base_lane_width, note_height)
-			draw_rect(note_rect, Color(1,1,0.1,1))
-		
-		# upper notes
-		elif note.lane >= 10 and note.lane <= 13:
-			var x = base_lane_width + (note.lane-10)*base_lane_width*1.5
-			var y = new_height - note.time*pixels_per_second - note_height
-			var note_rect: Rect2 = Rect2(x, y, base_lane_width*1.5, note_height)
-			draw_rect(note_rect, Color(0.13,0.25,1,0.5))
 			
 func generate_beats():
 	var data: Array = timing_points.duplicate()
@@ -154,4 +148,24 @@ func generate_beats():
 
 func _on_Chart_gui_input(event):
 	if event is InputEventMouseButton:
-		print("ui input")
+		if event.button_index == BUTTON_LEFT and event.pressed:
+			# event.position already gives us the position on the chart (and not the global position), how nice
+			print(event.position)
+			pass
+		if event.button_index == BUTTON_RIGHT and event.pressed:
+			pass
+			
+func _on_Note_gui_input(event):
+	if event is InputEventMouseButton:
+		if event.button_index == BUTTON_LEFT and event.pressed:
+			print("note pressed!")
+			pass
+		if event.button_index == BUTTON_RIGHT and event.pressed:
+			pass
+			
+func add_note(note_data: Dictionary):
+	var note_instance: Note = ObjNote.instance()
+	note_instance.set_data(note_data)
+	notes.append(note_instance)
+	add_child(note_instance)
+	note_instance.connect("gui_input", self, "_on_Note_gui_input")

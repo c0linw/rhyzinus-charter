@@ -8,6 +8,16 @@
 
 config_version=4
 
+_global_script_classes=[ {
+"base": "Control",
+"class": "Note",
+"language": "GDScript",
+"path": "res://note.gd"
+} ]
+_global_script_class_icons={
+"Note": ""
+}
+
 [application]
 
 config/name="Rhyzinus-charter"
