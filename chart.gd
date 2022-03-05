@@ -2,6 +2,7 @@ extends Control
 
 var notes: Array = [] # Array of lower or side note entities
 var timing_points: Array = [] # Array of timing point entities 
+var beats: Array = []
 var pixels_per_second = 512 # determines "vertical" scale of chart display
 var note_height = 32
 var base_lane_width = 64
@@ -55,6 +56,8 @@ func _ready():
 	var new_height = max(latest_note, latest_timing_point)
 	rect_min_size = Vector2(rect_min_size.x, new_height)
 	
+	beats = generate_beats()
+	
 	update()
 	for note in notes:
 		if note.lane >= 0 and note.lane <= 7:
@@ -94,7 +97,6 @@ func _draw():
 	draw_rect(Rect2(base_lane_width*7-1, 0, 4, new_height), Color(0.4, 0.4, 0.4, 1))
 	
 	# draw beat lines
-	var beats = generate_beats()
 	for beat in beats:
 		var thickness = 4 if beat.beat == 1 else 2
 		var line_color = Color(0.75, 0.75, 0.75) if beat.beat == 1 else Color(0.5, 0.5, 0.5)
@@ -150,8 +152,9 @@ func _on_Chart_gui_input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == BUTTON_LEFT and event.pressed:
 			# event.position already gives us the position on the chart (and not the global position), how nice
-			print(event.position)
-			pass
+			var snapped_time = find_closest_beat(event.position)
+			print("click is snapped to beat at %s" % snapped_time)
+			var closest_beat: float = find_closest_beat(event.position)
 		if event.button_index == BUTTON_RIGHT and event.pressed:
 			pass
 			
@@ -169,3 +172,40 @@ func add_note(note_data: Dictionary):
 	notes.append(note_instance)
 	add_child(note_instance)
 	note_instance.connect("gui_input", self, "_on_Note_gui_input")
+
+func find_closest_beat(position_on_chart: Vector2):
+	# modified binary search
+	var target: float = (rect_size.y - position_on_chart.y) / pixels_per_second # the time in seconds
+	var lower: int = 0
+	var upper: int = len(beats)
+	var mid: int = 0
+	
+	# Corner cases
+	if (len(beats) == 0):
+		return 0
+	if (target <= beats[0].time):
+		return beats[0].time
+	if (target >= beats[len(beats) - 1].time):
+		return beats[len(beats) - 1].time
+	
+	while lower < upper:
+		mid = (lower + upper) / 2
+		if (beats[mid].time == target):
+			return beats[mid].time
+			
+		if (target < beats[mid].time):
+			if (mid > 0 and target > beats[mid-1].time):
+				return get_nearest_number(target, beats[mid-1].time, beats[mid].time)
+			upper = mid
+		else:
+			if (mid < len(beats)-1 and target < beats[mid+1].time):
+				return get_nearest_number(target, beats[mid].time, beats[mid + 1].time)
+			lower = mid + 1
+		
+	return beats[mid].time
+	
+func get_nearest_number(target: float, val1: float, val2: float):
+	if (abs(target - val1) < abs(target - val2)):
+		return val1
+	else:
+		return val2
