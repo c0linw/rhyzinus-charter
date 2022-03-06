@@ -10,10 +10,10 @@ var base_lane_width = 64
 var ObjNote = preload("res://note.tscn")
 
 class TimeSorter:
-	static func sort_ascending(a: Dictionary, b: Dictionary) -> bool:
+	static func sort_ascending(a, b) -> bool:
 		return a.time < b.time
 			
-	static func sort_notes_ascending(a: Dictionary, b: Dictionary) -> bool:
+	static func sort_notes_ascending(a, b) -> bool:
 		if a.time < b.time:
 			return true
 		elif a.time == b.time:
@@ -151,10 +151,16 @@ func generate_beats():
 func _on_Chart_gui_input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == BUTTON_LEFT and event.pressed:
-			# event.position already gives us the position on the chart (and not the global position), how nice
-			var snapped_time = find_closest_beat(event.position)
-			print("click is snapped to beat at %s" % snapped_time)
-			var closest_beat: float = find_closest_beat(event.position)
+			# TODO: search for a note that already exists at the time and lane, and replace it if necessary
+			var snapped_time: float = find_closest_beat(event.position)
+			var snapped_lane: float = find_lane(event.position)
+			print("time=%s, lane=%s" % [snapped_time,snapped_lane])
+			var new_note_data: Dictionary = {
+				"time": snapped_time,
+				"lane": snapped_lane,
+				"type": "tap"
+			}
+			add_note(new_note_data)
 		if event.button_index == BUTTON_RIGHT and event.pressed:
 			pass
 			
@@ -170,8 +176,27 @@ func add_note(note_data: Dictionary):
 	var note_instance: Note = ObjNote.instance()
 	note_instance.set_data(note_data)
 	notes.append(note_instance)
+	notes.sort_custom(TimeSorter, "sort_notes_ascending")
 	add_child(note_instance)
 	note_instance.connect("gui_input", self, "_on_Note_gui_input")
+	
+	var latest_note = 0 if len(notes) == 0 else (notes[len(notes)-1].time+2) * pixels_per_second
+	var latest_timing_point = 0 if len(timing_points) == 0 else (timing_points[len(timing_points)-1].time+2) * pixels_per_second
+
+	var new_height = max(latest_note, latest_timing_point)
+	rect_min_size = Vector2(rect_min_size.x, new_height)
+	
+	update()
+	
+	if note_instance.lane >= 0 and note_instance.lane <= 7:
+		var x = note_instance.lane*base_lane_width
+		var y = new_height - note_instance.time*pixels_per_second - note_height
+		note_instance.set_position(Vector2(x,y))
+	elif note_instance.lane >= 10 and note_instance.lane <= 13:			
+		var x = base_lane_width + (note_instance.lane-10)*base_lane_width*1.5
+		var y = new_height - note_instance.time*pixels_per_second - note_height
+		note_instance.set_position(Vector2(x,y))
+	print(note_instance.rect_position, note_instance.rect_size)
 
 func find_closest_beat(position_on_chart: Vector2):
 	# modified binary search
@@ -209,3 +234,7 @@ func get_nearest_number(target: float, val1: float, val2: float):
 		return val1
 	else:
 		return val2
+		
+func find_lane(position_on_chart: Vector2):
+	# TODO: this only handles lower notes atm, will need different formula when editing upper (blue) notes
+	return int(floor(position_on_chart.x/base_lane_width))
