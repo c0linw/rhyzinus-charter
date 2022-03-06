@@ -50,25 +50,12 @@ func _ready():
 	notes.sort_custom(TimeSorter, "sort_notes_ascending")
 	timing_points.sort_custom(TimeSorter, "sort_ascending")
 	
-	var latest_note = 0 if len(notes) == 0 else (notes[len(notes)-1].time+2) * pixels_per_second
-	var latest_timing_point = 0 if len(timing_points) == 0 else (timing_points[len(timing_points)-1].time+2) * pixels_per_second
-
-	var new_height = max(latest_note, latest_timing_point)
-	rect_min_size = Vector2(rect_min_size.x, new_height)
+	update_chart_rect()
 	
 	beats = generate_beats()
 	
 	update()
-	for note in notes:
-		if note.lane >= 0 and note.lane <= 7:
-			var x = note.lane*base_lane_width
-			var y = new_height - note.time*pixels_per_second - note_height
-			note.set_position(Vector2(x,y))
-		elif note.lane >= 10 and note.lane <= 13:			
-			var x = base_lane_width + (note.lane-10)*base_lane_width*1.5
-			var y = new_height - note.time*pixels_per_second - note_height
-			note.set_position(Vector2(x,y))
-		print(note.rect_position, note.rect_size)
+	update_note_positions()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
@@ -164,13 +151,13 @@ func _on_Chart_gui_input(event):
 		if event.button_index == BUTTON_RIGHT and event.pressed:
 			pass
 			
-func _on_Note_gui_input(event):
+func _on_Note_gui_input(event, note):
 	if event is InputEventMouseButton:
 		if event.button_index == BUTTON_LEFT and event.pressed:
 			print("note pressed!")
-			pass
 		if event.button_index == BUTTON_RIGHT and event.pressed:
-			pass
+			print("deleting note at time %s, lane %s" % [note.time, note.lane])
+			delete_note(note)
 			
 func add_note(note_data: Dictionary):
 	var note_instance: Note = ObjNote.instance()
@@ -178,25 +165,33 @@ func add_note(note_data: Dictionary):
 	notes.append(note_instance)
 	notes.sort_custom(TimeSorter, "sort_notes_ascending")
 	add_child(note_instance)
-	note_instance.connect("gui_input", self, "_on_Note_gui_input")
+	note_instance.connect("custom_gui_input", self, "_on_Note_gui_input")
 	
+	update_chart_rect()
+	update_note_positions()
+	
+func update_chart_rect():
 	var latest_note = 0 if len(notes) == 0 else (notes[len(notes)-1].time+2) * pixels_per_second
 	var latest_timing_point = 0 if len(timing_points) == 0 else (timing_points[len(timing_points)-1].time+2) * pixels_per_second
 
 	var new_height = max(latest_note, latest_timing_point)
 	rect_min_size = Vector2(rect_min_size.x, new_height)
-	
 	update()
 	
-	if note_instance.lane >= 0 and note_instance.lane <= 7:
-		var x = note_instance.lane*base_lane_width
-		var y = new_height - note_instance.time*pixels_per_second - note_height
-		note_instance.set_position(Vector2(x,y))
-	elif note_instance.lane >= 10 and note_instance.lane <= 13:			
-		var x = base_lane_width + (note_instance.lane-10)*base_lane_width*1.5
-		var y = new_height - note_instance.time*pixels_per_second - note_height
-		note_instance.set_position(Vector2(x,y))
-	print(note_instance.rect_position, note_instance.rect_size)
+func update_note_positions():
+	for note in notes:
+		if note.lane >= 0 and note.lane <= 7:
+			var x = note.lane*base_lane_width
+			var y = rect_min_size.y - note.time*pixels_per_second - note_height
+			note.set_position(Vector2(x,y))
+		elif note.lane >= 10 and note.lane <= 13:			
+			var x = base_lane_width + (note.lane-10)*base_lane_width*1.5
+			var y = rect_min_size.y - note.time*pixels_per_second - note_height
+			note.set_position(Vector2(x,y))
+		print(note.rect_position, note.rect_size)
+	
+func delete_note(note):
+	pass
 
 func find_closest_beat(position_on_chart: Vector2):
 	# modified binary search

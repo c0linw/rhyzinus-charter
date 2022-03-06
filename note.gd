@@ -9,6 +9,8 @@ var note_height = 32
 var base_lane_width = 64
 var note_color: Color = Color(1,1,1,1)
 
+signal custom_gui_input(event, note)
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass # Replace with function body.
@@ -35,3 +37,7 @@ func set_data(note_data: Dictionary):
 func _draw():
 	var to_draw = Rect2(Vector2(0,0), rect_size)
 	draw_rect(to_draw, note_color)
+
+
+func _on_Note_gui_input(event):
+	emit_signal("custom_gui_input", event, self)
