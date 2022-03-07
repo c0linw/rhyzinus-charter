@@ -167,7 +167,7 @@ func add_note(note_data: Dictionary):
 	
 	if note_instance.time < latest_note_time or duplicate_note != null:
 		notes.sort_custom(TimeSorter, "sort_notes_ascending")
-		update_note_positions()
+	update_note_positions()
 		
 func delete_note(note):
 	print("deleting note with time %s, lane %s" % [note.time, note.lane])
