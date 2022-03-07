@@ -136,7 +136,6 @@ func _on_Chart_gui_input(event):
 			# TODO: search for a note that already exists at the time and lane, and replace it if necessary
 			var snapped_time: float = find_closest_beat(event.position)
 			var snapped_lane: float = find_lane(event.position)
-			print("time=%s, lane=%s" % [snapped_time,snapped_lane])
 			var new_note_data: Dictionary = {
 				"time": snapped_time,
 				"lane": snapped_lane,
@@ -151,20 +150,42 @@ func _on_Note_gui_input(event, note):
 		if event.button_index == BUTTON_LEFT and event.pressed:
 			print("note pressed!")
 		if event.button_index == BUTTON_RIGHT and event.pressed:
-			print("deleting note at time %s, lane %s" % [note.time, note.lane])
 			delete_note(note)
 			
 func add_note(note_data: Dictionary):
 	var latest_note_time = notes[len(notes)-1].time if len(notes) > 0 else 0
 	var note_instance: Note = ObjNote.instance()
 	note_instance.set_data(note_data)
+	var duplicate_note = find_note(note_instance.time, note_instance.lane)
+	if duplicate_note != null:
+		print("duplicate note detected! Deleting old note...")
+		delete_note(duplicate_note)
+	print("adding note with time %s, lane %s" % [note_instance.time, note_instance.lane])
 	notes.append(note_instance)
 	add_child(note_instance)
 	note_instance.connect("custom_gui_input", self, "_on_Note_gui_input")
 	
-	if (note_instance.time < latest_note_time):
+	if note_instance.time < latest_note_time or duplicate_note != null:
 		notes.sort_custom(TimeSorter, "sort_notes_ascending")
 		update_note_positions()
+		
+func delete_note(note):
+	print("deleting note with time %s, lane %s" % [note.time, note.lane])
+	notes.erase(note)
+	note.queue_free()
+	
+# returns a note entity, or null
+func find_note(time: float, lane: int):
+	# not sure how well binary search will deal with error margins and two sort parameters (time and lane), so just linear search for now
+	
+	# use an error margin in case of float rounding problems 
+	var error_margin: float = 0.002
+	for note in notes:
+		if note.lane == lane and abs(note.time - time) <= error_margin:
+			return note
+		elif note.time > time + error_margin:
+			return null
+	return null
 	
 func update_chart_length(audio_length: float):
 	#var latest_note = 0 if len(notes) == 0 else (notes[len(notes)-1].time+2) * pixels_per_second
@@ -187,11 +208,6 @@ func update_note_positions():
 			var x = base_lane_width + (note.lane-10)*base_lane_width*1.5
 			var y = rect_min_size.y - note.time*pixels_per_second - note_height
 			note.set_position(Vector2(x,y))
-		print(note.rect_position, note.rect_size)
-	
-func delete_note(note):
-	notes.erase(note)
-	note.queue_free()
 
 func find_closest_beat(position_on_chart: Vector2):
 	# modified binary search
