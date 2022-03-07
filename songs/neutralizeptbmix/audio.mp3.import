@@ -1,0 +1,15 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+path="res://.import/audio.mp3-175ccebb96ff10c82726966dbd5becfd.mp3str"
+
+[deps]
+
+source_file="res://songs/neutralizeptbmix/audio.mp3"
+dest_files=[ "res://.import/audio.mp3-175ccebb96ff10c82726966dbd5becfd.mp3str" ]
+
+[params]
+
+loop=true
+loop_offset=0

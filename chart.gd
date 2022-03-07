@@ -6,6 +6,8 @@ var beats: Array = []
 var pixels_per_second = 512 # determines "vertical" scale of chart display
 var note_height = 32
 var base_lane_width = 64
+var current_song_position = 0
+var song_length: float = 0
 
 var ObjNote = preload("res://note.tscn")
 
@@ -42,15 +44,13 @@ func _ready():
 		
 	timing_points.append({
 		"time": 0,
-		"beat_length": 500,
+		"beat_length": 0.5,
 		"meter": 4,
 		"type": "bpm"
 	})
 		
 	notes.sort_custom(TimeSorter, "sort_notes_ascending")
 	timing_points.sort_custom(TimeSorter, "sort_ascending")
-	
-	update_chart_rect()
 	
 	beats = generate_beats()
 	
@@ -62,37 +62,31 @@ func _ready():
 #	pass
 
 func _draw():
-	var latest_note = 0 if len(notes) == 0 else (notes[len(notes)-1].time+2) * pixels_per_second
-	var latest_timing_point = 0 if len(timing_points) == 0 else (timing_points[len(timing_points)-1].time+2) * pixels_per_second
-
-	var new_height = max(latest_note, latest_timing_point)
-	rect_min_size = Vector2(rect_min_size.x, new_height)
-	
 	# draw lane divisions
-	draw_rect(Rect2(base_lane_width-3, 0, 4, new_height), Color(0.4, 0.4, 0.4, 1))
+	draw_rect(Rect2(base_lane_width-3, 0, 4, rect_min_size.y), Color(0.4, 0.4, 0.4, 1))
 		
 	for i in range(2, 4):
-		var divider_rect: Rect2 = Rect2(base_lane_width*i-1, 0, 2, new_height)
+		var divider_rect: Rect2 = Rect2(base_lane_width*i-1, 0, 2, rect_min_size.y)
 		draw_rect(divider_rect, Color(0.4, 0.4, 0.4, 1))
 		
-	draw_rect(Rect2(base_lane_width*4-2, 0, 4, new_height), Color(0.4, 0.4, 0.4, 1))
+	draw_rect(Rect2(base_lane_width*4-2, 0, 4, rect_min_size.y), Color(0.4, 0.4, 0.4, 1))
 		
 	for i in range(5, 7):
-		var divider_rect: Rect2 = Rect2(base_lane_width*i-1, 0, 2, new_height)
+		var divider_rect: Rect2 = Rect2(base_lane_width*i-1, 0, 2, rect_min_size.y)
 		draw_rect(divider_rect, Color(0.4, 0.4, 0.4, 1))
 		
-	draw_rect(Rect2(base_lane_width*7-1, 0, 4, new_height), Color(0.4, 0.4, 0.4, 1))
+	draw_rect(Rect2(base_lane_width*7-1, 0, 4, rect_min_size.y), Color(0.4, 0.4, 0.4, 1))
 	
 	# draw beat lines
 	for beat in beats:
 		var thickness = 4 if beat.beat == 1 else 2
 		var line_color = Color(0.75, 0.75, 0.75) if beat.beat == 1 else Color(0.5, 0.5, 0.5)
-		var line_rect: Rect2 = Rect2(0, new_height-beat.time*pixels_per_second-(thickness-1), rect_size.x, thickness)
+		var line_rect: Rect2 = Rect2(0, rect_min_size.y-beat.time*pixels_per_second-(thickness-1), rect_size.x, thickness)
 		draw_rect(line_rect, line_color)
 	
 	# draw bpm changes
 	for timing_point in timing_points:
-		var line_rect: Rect2 = Rect2(0, new_height-timing_point.time*pixels_per_second-4, rect_size.x, 4)
+		var line_rect: Rect2 = Rect2(0, rect_min_size.y-timing_point.time*pixels_per_second-4, rect_size.x, 4)
 		draw_rect(line_rect, Color(1, 0, 0, 1))
 			
 func generate_beats():
@@ -100,7 +94,7 @@ func generate_beats():
 	data.sort_custom(TimeSorter, "sort_ascending")
 	var beat_output: Array = []
 	var timestamp: float = data[0]["time"]
-	var beat_length: float = data[0].beat_length / 1000.0
+	var beat_length: float = data[0].beat_length
 	var meter: int = data[0]["meter"]
 	var measure: int = 1
 	var beat = 1
@@ -110,18 +104,19 @@ func generate_beats():
 			"beat": beat
 		})
 	var index: int = 0
-	# use either the last note or the last timing point's time
-	var end_time: float = max(data[len(data)-1]["time"], notes[len(notes)-1]["time"]) + 2
+	# var end_time: float = max(data[len(data)-1]["time"], notes[len(notes)-1]["time"]) + 2
+	var end_time: float = song_length
 	while timestamp <= end_time:
 		if beat % meter == 0:
 			measure += 1
 			beat = 0
 		var next_beat_time: float = timestamp + beat_length
-		if index+1 < len(data) && data[index+1]["type"] == "bpm" && next_beat_time >= data[index+1]:
-			timestamp = data[index+1]["time"]
-			beat_length = data[index+1]["beat_length"]
-			meter = data[index+1]["meter"]
-			beat = 0
+		if index+1 < len(data) && next_beat_time >= data[index+1].time:
+			if data[index+1].type == "bpm":
+				timestamp = data[index+1].time
+				beat_length = data[index+1].beat_length
+				meter = data[index+1].meter
+				beat = 0
 			index += 1
 		else:
 			timestamp = next_beat_time
@@ -160,23 +155,27 @@ func _on_Note_gui_input(event, note):
 			delete_note(note)
 			
 func add_note(note_data: Dictionary):
+	var latest_note_time = notes[len(notes)-1].time if len(notes) > 0 else 0
 	var note_instance: Note = ObjNote.instance()
 	note_instance.set_data(note_data)
 	notes.append(note_instance)
-	notes.sort_custom(TimeSorter, "sort_notes_ascending")
 	add_child(note_instance)
 	note_instance.connect("custom_gui_input", self, "_on_Note_gui_input")
 	
-	update_chart_rect()
-	update_note_positions()
+	if (note_instance.time < latest_note_time):
+		notes.sort_custom(TimeSorter, "sort_notes_ascending")
+		update_note_positions()
 	
-func update_chart_rect():
-	var latest_note = 0 if len(notes) == 0 else (notes[len(notes)-1].time+2) * pixels_per_second
-	var latest_timing_point = 0 if len(timing_points) == 0 else (timing_points[len(timing_points)-1].time+2) * pixels_per_second
+func update_chart_length(audio_length: float):
+	#var latest_note = 0 if len(notes) == 0 else (notes[len(notes)-1].time+2) * pixels_per_second
+	#var latest_timing_point = 0 if len(timing_points) == 0 else (timing_points[len(timing_points)-1].time+2) * pixels_per_second
 
-	var new_height = max(latest_note, latest_timing_point)
-	rect_min_size = Vector2(rect_min_size.x, new_height)
+	#var new_height = max(latest_note, latest_timing_point)
+	song_length = audio_length
+	rect_min_size = Vector2(rect_min_size.x, audio_length*pixels_per_second)
 	update()
+	beats = generate_beats()
+	update_note_positions()
 	
 func update_note_positions():
 	for note in notes:
@@ -191,7 +190,8 @@ func update_note_positions():
 		print(note.rect_position, note.rect_size)
 	
 func delete_note(note):
-	pass
+	notes.erase(note)
+	note.queue_free()
 
 func find_closest_beat(position_on_chart: Vector2):
 	# modified binary search
