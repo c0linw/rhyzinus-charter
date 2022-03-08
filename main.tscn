@@ -195,11 +195,33 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource( 1 )
 
+[node name="Timing" type="Control" parent="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart"]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Lower" type="Control" parent="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart"]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Upper" type="Control" parent="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart"]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="SongAudioPlayer" type="AudioStreamPlayer" parent="."]
 script = ExtResource( 3 )
 
 [connection signal="item_selected" from="VBoxContainer/PanelContainer/HBoxContainer/SubdivisionOption" to="VBoxContainer/PanelContainer/HBoxContainer/SubdivisionOption" method="_on_SubdivisionOption_item_selected"]
 [connection signal="subdivision_changed" from="VBoxContainer/PanelContainer/HBoxContainer/SubdivisionOption" to="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" method="_on_SubdivisionOption_subdivision_changed"]
+[connection signal="tab_selected" from="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs" to="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" method="_on_LayerSelectTabs_tab_selected"]
 [connection signal="tab_selected" from="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs/VerticalTabs/Lower" to="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs" method="_on_custom_tab_selected"]
 [connection signal="tab_selected" from="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs/VerticalTabs/Upper" to="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs" method="_on_custom_tab_selected"]
 [connection signal="tab_selected" from="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs/VerticalTabs/Timing" to="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs" method="_on_custom_tab_selected"]

@@ -5,6 +5,8 @@ extends HBoxContainer
 # var a = 2
 # var b = "text"
 
+signal tab_selected(name)
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	_on_custom_tab_selected(0)
@@ -26,3 +28,10 @@ func _on_custom_tab_selected(index):
 			child.currently_selected = false
 			child.flat = false
 			child.rect_min_size = Vector2(55,0)
+	match index:
+		0:
+			emit_signal("tab_selected", "Lower")
+		1:
+			emit_signal("tab_selected", "Upper")
+		2:
+			emit_signal("tab_selected", "Timing")

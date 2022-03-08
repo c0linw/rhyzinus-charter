@@ -21,7 +21,7 @@ class TimeSorter:
 		if a.time < b.time:
 			return true
 		elif a.time == b.time:
-			return a.lane < b.lane # floor notes come before upper notes, guarantees the upper notes draw over them
+			return a.lane < b.lane
 		else:
 			return false
 
@@ -179,6 +179,8 @@ func _on_Note_gui_input(event, note):
 			delete_note(note)
 			
 func add_note(note_data: Dictionary):
+	if note_data.lane < 0 or note_data.lane > 13 or (note_data.lane > 7 and note_data.lane < 10):
+		return
 	var latest_note_time = notes[len(notes)-1].time if len(notes) > 0 else 0
 	var note_instance: Note = ObjNote.instance()
 	note_instance.set_data(note_data)
@@ -188,10 +190,13 @@ func add_note(note_data: Dictionary):
 		delete_note(duplicate_note)
 	print("adding note with time %s, lane %s" % [note_instance.time, note_instance.lane])
 	notes.append(note_instance)
-	add_child(note_instance)
+	if note_instance.lane >= 0 and note_instance.lane <= 7:
+		$Lower.add_child(note_instance)
+	elif note_instance.lane >= 10 and note_instance.lane <= 13:
+		$Upper.add_child(note_instance)
 	note_instance.connect("custom_gui_input", self, "_on_Note_gui_input")
 	
-	if note_instance.time < latest_note_time or duplicate_note != null:
+	if note_instance.time <= latest_note_time or duplicate_note != null:
 		notes.sort_custom(TimeSorter, "sort_notes_ascending")
 	update_note_positions()
 		
@@ -282,3 +287,27 @@ func _on_SubdivisionOption_subdivision_changed(subdivision):
 	beats = generate_beats(subdivision)
 	print("subdivision changed to %s" % subdivision)
 	update()
+
+
+func _on_LayerSelectTabs_tab_selected(name):
+	var layers: Array = [
+		{"instance": $Lower, "enable": false},
+		{"instance": $Upper, "enable": false},
+		{"instance": $Timing, "enable": false},
+	]
+	match name:
+		"Lower":
+			layers[0].enable = true
+		"Upper":
+			layers[1].enable = true
+		"Timing":
+			layers[2].enable = true
+		_:
+			return
+	for layer in layers:
+		if layer.enable:
+			for child in layer.instance.get_children():
+				child.mouse_filter = MOUSE_FILTER_STOP
+		else:
+			for child in layer.instance.get_children():
+				child.mouse_filter = MOUSE_FILTER_IGNORE
