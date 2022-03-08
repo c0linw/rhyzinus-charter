@@ -4,12 +4,14 @@ var notes: Array = [] # Array of lower or side note entities
 var timing_points: Array = [] # Array of timing point entities 
 var beats: Array = []
 var pixels_per_second = 512 # determines "vertical" scale of chart display
-var note_height = 32
+var note_height = 16
 var base_lane_width = 64
 var current_song_position = 0
 var song_length: float = 0
 
 var ObjNote = preload("res://note.tscn")
+
+enum BeatType {MEASURE, BEAT, SUBDIVISION}
 
 class TimeSorter:
 	static func sort_ascending(a, b) -> bool:
@@ -79,8 +81,19 @@ func _draw():
 	
 	# draw beat lines
 	for beat in beats:
-		var thickness = 4 if beat.beat == 1 else 2
-		var line_color = Color(0.75, 0.75, 0.75) if beat.beat == 1 else Color(0.5, 0.5, 0.5)
+		var thickness
+		var line_color
+		match beat.type:
+			BeatType.MEASURE:
+				thickness = 4
+				line_color = Color(0.75, 0.75, 0.75)
+			BeatType.BEAT:
+				thickness = 2
+				line_color = Color(0.5, 0.5, 0.5)
+			BeatType.SUBDIVISION:
+				thickness = 2
+				line_color = Color(0.25, 0.25, 0.25)
+		
 		var line_rect: Rect2 = Rect2(0, rect_min_size.y-beat.time*pixels_per_second-(thickness-1), rect_size.x, thickness)
 		draw_rect(line_rect, line_color)
 	
@@ -89,7 +102,7 @@ func _draw():
 		var line_rect: Rect2 = Rect2(0, rect_min_size.y-timing_point.time*pixels_per_second-4, rect_size.x, 4)
 		draw_rect(line_rect, Color(1, 0, 0, 1))
 			
-func generate_beats():
+func generate_beats(subdivision: int = 4):
 	var data: Array = timing_points.duplicate()
 	data.sort_custom(TimeSorter, "sort_ascending")
 	var beat_output: Array = []
@@ -97,26 +110,36 @@ func generate_beats():
 	var beat_length: float = data[0].beat_length
 	var meter: int = data[0]["meter"]
 	var measure: int = 1
-	var beat = 1
+	var beat: int = 1
 	beat_output.append({
 			"time": timestamp,
 			"measure": measure,
-			"beat": beat
+			"beat": int(ceil(float(beat) / subdivision)),
+			"sub_beat": beat % subdivision,
+			"denominator": subdivision,
+			"type": BeatType.MEASURE
 		})
 	var index: int = 0
 	# var end_time: float = max(data[len(data)-1]["time"], notes[len(notes)-1]["time"]) + 2
 	var end_time: float = song_length
+	var beat_type
 	while timestamp <= end_time:
-		if beat % meter == 0:
+		if beat % (meter*subdivision) == 0:
 			measure += 1
 			beat = 0
-		var next_beat_time: float = timestamp + beat_length
+			beat_type = BeatType.MEASURE
+		elif beat % subdivision == 0:
+			beat_type = BeatType.BEAT
+		else: 
+			beat_type = BeatType.SUBDIVISION
+		var next_beat_time: float = timestamp + beat_length / subdivision
 		if index+1 < len(data) && next_beat_time >= data[index+1].time:
 			if data[index+1].type == "bpm":
 				timestamp = data[index+1].time
 				beat_length = data[index+1].beat_length
 				meter = data[index+1].meter
 				beat = 0
+				beat_type = BeatType.MEASURE
 			index += 1
 		else:
 			timestamp = next_beat_time
@@ -125,7 +148,10 @@ func generate_beats():
 		beat_output.append({
 			"time": timestamp,
 			"measure": measure,
-			"beat": beat
+			"beat": int(ceil(float(beat) / subdivision)),
+			"sub_beat": beat % subdivision,
+			"denominator": subdivision,
+			"type": beat_type
 		})
 	return beat_output
 
@@ -249,3 +275,10 @@ func get_nearest_number(target: float, val1: float, val2: float):
 func find_lane(position_on_chart: Vector2):
 	# TODO: this only handles lower notes atm, will need different formula when editing upper (blue) notes
 	return int(floor(position_on_chart.x/base_lane_width))
+
+
+func _on_SubdivisionOption_subdivision_changed(subdivision):
+	# TODO: re-generate beat lines with new subdivision
+	beats = generate_beats(subdivision)
+	print("subdivision changed to %s" % subdivision)
+	update()

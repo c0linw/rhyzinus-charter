@@ -5,7 +5,7 @@ var time: float
 var lane: int
 var type: String # "tap" or "hold"
 
-var note_height = 32
+var note_height = 16
 var base_lane_width = 64
 var note_color: Color = Color(1,1,1,1)
 

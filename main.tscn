@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://chart.gd" type="Script" id=1]
 [ext_resource path="res://chart_view.gd" type="Script" id=2]
@@ -6,6 +6,7 @@
 [ext_resource path="res://main.gd" type="Script" id=4]
 [ext_resource path="res://layer_select_tabs.gd" type="Script" id=5]
 [ext_resource path="res://custom_tab_button.gd" type="Script" id=6]
+[ext_resource path="res://subdivision_option.gd" type="Script" id=7]
 
 [sub_resource type="StyleBoxFlat" id=1]
 bg_color = Color( 0.105882, 0.113725, 0.12549, 1 )
@@ -40,6 +41,20 @@ margin_left = 7.0
 margin_top = 7.0
 margin_right = 1017.0
 margin_bottom = 57.0
+
+[node name="SubdivisionLabel" type="Label" parent="VBoxContainer/PanelContainer/HBoxContainer"]
+margin_top = 18.0
+margin_right = 81.0
+margin_bottom = 32.0
+text = "Subdivision: "
+
+[node name="SubdivisionOption" type="OptionButton" parent="VBoxContainer/PanelContainer/HBoxContainer"]
+margin_left = 85.0
+margin_right = 183.0
+margin_bottom = 50.0
+text = "1/4 (16ths)"
+selected = 3
+script = ExtResource( 7 )
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
 margin_top = 64.0
@@ -183,6 +198,8 @@ script = ExtResource( 1 )
 [node name="SongAudioPlayer" type="AudioStreamPlayer" parent="."]
 script = ExtResource( 3 )
 
+[connection signal="item_selected" from="VBoxContainer/PanelContainer/HBoxContainer/SubdivisionOption" to="VBoxContainer/PanelContainer/HBoxContainer/SubdivisionOption" method="_on_SubdivisionOption_item_selected"]
+[connection signal="subdivision_changed" from="VBoxContainer/PanelContainer/HBoxContainer/SubdivisionOption" to="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" method="_on_SubdivisionOption_subdivision_changed"]
 [connection signal="tab_selected" from="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs/VerticalTabs/Lower" to="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs" method="_on_custom_tab_selected"]
 [connection signal="tab_selected" from="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs/VerticalTabs/Upper" to="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs" method="_on_custom_tab_selected"]
 [connection signal="tab_selected" from="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs/VerticalTabs/Timing" to="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs" method="_on_custom_tab_selected"]
