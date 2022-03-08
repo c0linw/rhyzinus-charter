@@ -34,4 +34,4 @@ func _on_custom_tab_selected(index):
 		1:
 			emit_signal("tab_selected", "Upper")
 		2:
-			emit_signal("tab_selected", "Timing")
+			emit_signal("tab_selected", "Timing")	

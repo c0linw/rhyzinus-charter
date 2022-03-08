@@ -1,5 +1,9 @@
 extends Control
 
+const ZOOM_INCREMENT = 64
+const MAX_ZOOM = 1024
+const MIN_ZOOM = 64
+
 var notes: Array = [] # Array of lower or side note entities
 var timing_points: Array = [] # Array of timing point entities 
 var beats: Array = []
@@ -311,3 +315,16 @@ func _on_LayerSelectTabs_tab_selected(name):
 		else:
 			for child in layer.instance.get_children():
 				child.mouse_filter = MOUSE_FILTER_IGNORE
+
+
+func _on_ZoomMinus_pressed():
+	if pixels_per_second <= MIN_ZOOM :
+		return
+	pixels_per_second = max(pixels_per_second-ZOOM_INCREMENT, MIN_ZOOM)
+	update_chart_length(song_length)
+
+func _on_ZoomPlus_pressed():
+	if pixels_per_second >= MAX_ZOOM :
+		return
+	pixels_per_second = min(pixels_per_second+ZOOM_INCREMENT, MAX_ZOOM)
+	update_chart_length(song_length)

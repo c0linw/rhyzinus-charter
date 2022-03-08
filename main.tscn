@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://chart.gd" type="Script" id=1]
 [ext_resource path="res://chart_view.gd" type="Script" id=2]
@@ -7,6 +7,8 @@
 [ext_resource path="res://layer_select_tabs.gd" type="Script" id=5]
 [ext_resource path="res://custom_tab_button.gd" type="Script" id=6]
 [ext_resource path="res://subdivision_option.gd" type="Script" id=7]
+[ext_resource path="res://images/zoom_plus.png" type="Texture" id=8]
+[ext_resource path="res://images/zoom_minus.png" type="Texture" id=9]
 
 [sub_resource type="StyleBoxFlat" id=1]
 bg_color = Color( 0.105882, 0.113725, 0.12549, 1 )
@@ -50,11 +52,33 @@ text = "Subdivision: "
 
 [node name="SubdivisionOption" type="OptionButton" parent="VBoxContainer/PanelContainer/HBoxContainer"]
 margin_left = 85.0
+margin_top = 15.0
 margin_right = 183.0
-margin_bottom = 50.0
+margin_bottom = 35.0
+size_flags_vertical = 4
 text = "1/4 (16ths)"
 selected = 3
 script = ExtResource( 7 )
+
+[node name="ZoomMinus" type="Button" parent="VBoxContainer/PanelContainer/HBoxContainer"]
+margin_left = 187.0
+margin_top = 1.0
+margin_right = 235.0
+margin_bottom = 49.0
+rect_min_size = Vector2( 48, 48 )
+size_flags_vertical = 4
+icon = ExtResource( 9 )
+expand_icon = true
+
+[node name="ZoomPlus" type="Button" parent="VBoxContainer/PanelContainer/HBoxContainer"]
+margin_left = 239.0
+margin_top = 1.0
+margin_right = 287.0
+margin_bottom = 49.0
+rect_min_size = Vector2( 48, 48 )
+size_flags_vertical = 4
+icon = ExtResource( 8 )
+expand_icon = true
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
 margin_top = 64.0
@@ -221,6 +245,8 @@ script = ExtResource( 3 )
 
 [connection signal="item_selected" from="VBoxContainer/PanelContainer/HBoxContainer/SubdivisionOption" to="VBoxContainer/PanelContainer/HBoxContainer/SubdivisionOption" method="_on_SubdivisionOption_item_selected"]
 [connection signal="subdivision_changed" from="VBoxContainer/PanelContainer/HBoxContainer/SubdivisionOption" to="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" method="_on_SubdivisionOption_subdivision_changed"]
+[connection signal="pressed" from="VBoxContainer/PanelContainer/HBoxContainer/ZoomMinus" to="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" method="_on_ZoomMinus_pressed"]
+[connection signal="pressed" from="VBoxContainer/PanelContainer/HBoxContainer/ZoomPlus" to="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" method="_on_ZoomPlus_pressed"]
 [connection signal="tab_selected" from="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs" to="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" method="_on_LayerSelectTabs_tab_selected"]
 [connection signal="tab_selected" from="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs/VerticalTabs/Lower" to="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs" method="_on_custom_tab_selected"]
 [connection signal="tab_selected" from="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs/VerticalTabs/Upper" to="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs" method="_on_custom_tab_selected"]
