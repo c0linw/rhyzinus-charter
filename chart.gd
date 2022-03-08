@@ -4,6 +4,8 @@ const ZOOM_INCREMENT = 64
 const MAX_ZOOM = 1024
 const MIN_ZOOM = 64
 
+enum {LAYER_LOWER, LAYER_UPPER, LAYER_TIMING}
+
 var notes: Array = [] # Array of lower or side note entities
 var timing_points: Array = [] # Array of timing point entities 
 var beats: Array = []
@@ -12,6 +14,8 @@ var note_height = 16
 var base_lane_width = 64
 var current_song_position = 0
 var song_length: float = 0
+
+var selected_layer = LAYER_LOWER
 
 var ObjNote = preload("res://note.tscn")
 
@@ -69,19 +73,27 @@ func _ready():
 
 func _draw():
 	# draw lane divisions
+	
+	# left line
 	draw_rect(Rect2(base_lane_width-3, 0, 4, rect_min_size.y), Color(0.4, 0.4, 0.4, 1))
-		
-	for i in range(2, 4):
-		var divider_rect: Rect2 = Rect2(base_lane_width*i-1, 0, 2, rect_min_size.y)
-		draw_rect(divider_rect, Color(0.4, 0.4, 0.4, 1))
-		
+	# center line
 	draw_rect(Rect2(base_lane_width*4-2, 0, 4, rect_min_size.y), Color(0.4, 0.4, 0.4, 1))
-		
-	for i in range(5, 7):
-		var divider_rect: Rect2 = Rect2(base_lane_width*i-1, 0, 2, rect_min_size.y)
-		draw_rect(divider_rect, Color(0.4, 0.4, 0.4, 1))
-		
+	# right line
 	draw_rect(Rect2(base_lane_width*7-1, 0, 4, rect_min_size.y), Color(0.4, 0.4, 0.4, 1))
+		
+	# the thinner lines between the left/middle/right lines
+	if selected_layer == LAYER_UPPER || selected_layer == LAYER_TIMING:
+		draw_rect(Rect2(base_lane_width*2.5, 0, 2, rect_min_size.y), Color(0.4, 0.4, 0.6, 1))
+		draw_rect(Rect2(base_lane_width*5.5, 0, 2, rect_min_size.y), Color(0.4, 0.4, 0.6, 1))
+	if selected_layer == LAYER_LOWER || selected_layer == LAYER_TIMING:
+		for i in range(2, 4):
+			var divider_rect: Rect2 = Rect2(base_lane_width*i-1, 0, 2, rect_min_size.y)
+			draw_rect(divider_rect, Color(0.4, 0.4, 0.4, 1))
+				
+		for i in range(5, 7):
+			var divider_rect: Rect2 = Rect2(base_lane_width*i-1, 0, 2, rect_min_size.y)
+			draw_rect(divider_rect, Color(0.4, 0.4, 0.4, 1))
+	
 	
 	# draw beat lines
 	for beat in beats:
@@ -163,7 +175,6 @@ func generate_beats(subdivision: int = 4):
 func _on_Chart_gui_input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == BUTTON_LEFT and event.pressed:
-			# TODO: search for a note that already exists at the time and lane, and replace it if necessary
 			var snapped_time: float = find_closest_beat(event.position)
 			var snapped_lane: float = find_lane(event.position)
 			var new_note_data: Dictionary = {
@@ -283,11 +294,13 @@ func get_nearest_number(target: float, val1: float, val2: float):
 		
 func find_lane(position_on_chart: Vector2):
 	# TODO: this only handles lower notes atm, will need different formula when editing upper (blue) notes
-	return int(floor(position_on_chart.x/base_lane_width))
+	if selected_layer == LAYER_LOWER:
+		return int(floor(position_on_chart.x/base_lane_width))
+	if selected_layer == LAYER_UPPER:
+		return int(floor((position_on_chart.x - base_lane_width)/(base_lane_width*1.5))) + 10
 
 
 func _on_SubdivisionOption_subdivision_changed(subdivision):
-	# TODO: re-generate beat lines with new subdivision
 	beats = generate_beats(subdivision)
 	print("subdivision changed to %s" % subdivision)
 	update()
@@ -302,10 +315,13 @@ func _on_LayerSelectTabs_tab_selected(name):
 	match name:
 		"Lower":
 			layers[0].enable = true
+			selected_layer = LAYER_LOWER
 		"Upper":
 			layers[1].enable = true
+			selected_layer = LAYER_UPPER
 		"Timing":
 			layers[2].enable = true
+			selected_layer = LAYER_TIMING
 		_:
 			return
 	for layer in layers:
@@ -315,6 +331,7 @@ func _on_LayerSelectTabs_tab_selected(name):
 		else:
 			for child in layer.instance.get_children():
 				child.mouse_filter = MOUSE_FILTER_IGNORE
+	update()
 
 
 func _on_ZoomMinus_pressed():
