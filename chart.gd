@@ -19,6 +19,8 @@ var selected_layer = LAYER_LOWER
 
 var ObjNote = preload("res://note.tscn")
 
+signal anchor_scroll(percentage, new_size)
+
 enum BeatType {MEASURE, BEAT, SUBDIVISION}
 
 class TimeSorter:
@@ -233,16 +235,19 @@ func find_note(time: float, lane: int):
 			return null
 	return null
 	
-func update_chart_length(audio_length: float):
+func update_chart_length(audio_length: float) -> float:
 	#var latest_note = 0 if len(notes) == 0 else (notes[len(notes)-1].time+2) * pixels_per_second
 	#var latest_timing_point = 0 if len(timing_points) == 0 else (timing_points[len(timing_points)-1].time+2) * pixels_per_second
 
 	#var new_height = max(latest_note, latest_timing_point)
+	
 	song_length = audio_length
-	rect_min_size = Vector2(rect_min_size.x, audio_length*pixels_per_second)
+	var new_length = audio_length*pixels_per_second
+	rect_min_size = Vector2(rect_min_size.x, new_length)
 	update()
 	beats = generate_beats()
 	update_note_positions()
+	return new_length
 	
 func update_note_positions():
 	for note in notes:
@@ -293,7 +298,6 @@ func get_nearest_number(target: float, val1: float, val2: float):
 		return val2
 		
 func find_lane(position_on_chart: Vector2):
-	# TODO: this only handles lower notes atm, will need different formula when editing upper (blue) notes
 	if selected_layer == LAYER_LOWER:
 		return int(floor(position_on_chart.x/base_lane_width))
 	if selected_layer == LAYER_UPPER:
@@ -338,10 +342,19 @@ func _on_ZoomMinus_pressed():
 	if pixels_per_second <= MIN_ZOOM :
 		return
 	pixels_per_second = max(pixels_per_second-ZOOM_INCREMENT, MIN_ZOOM)
-	update_chart_length(song_length)
+	
+	var old_scroll_percent = (get_parent().scroll_vertical + get_parent().rect_size.y) / rect_size.y
+	var new_length = update_chart_length(song_length)
+	yield(VisualServer, "frame_post_draw")
+	emit_signal("anchor_scroll", old_scroll_percent, new_length)
 
 func _on_ZoomPlus_pressed():
 	if pixels_per_second >= MAX_ZOOM :
 		return
 	pixels_per_second = min(pixels_per_second+ZOOM_INCREMENT, MAX_ZOOM)
+	
+	var old_scroll_percent = (get_parent().scroll_vertical + get_parent().rect_size.y) / rect_size.y
 	update_chart_length(song_length)
+	var new_length = update_chart_length(song_length)
+	yield(VisualServer, "frame_post_draw")
+	emit_signal("anchor_scroll", old_scroll_percent, new_length)

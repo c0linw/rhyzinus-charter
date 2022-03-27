@@ -10,3 +10,8 @@ func _ready():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass
+
+
+func _on_Chart_anchor_scroll(percentage, new_size):
+	scroll_vertical = percentage * new_size - rect_size.y
+	update()
