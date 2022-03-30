@@ -16,6 +16,7 @@ var current_song_position = 0
 var song_length: float = 0
 
 var selected_layer = LAYER_LOWER
+var selected_notetype = "tap_lower" # see notetype_button for enumeration of string types
 
 var ObjNote = preload("res://note.tscn")
 
@@ -177,14 +178,54 @@ func generate_beats(subdivision: int = 4):
 func _on_Chart_gui_input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == BUTTON_LEFT and event.pressed:
+			print("current scroll: ", get_parent().scroll_vertical)
 			var snapped_time: float = find_closest_beat(event.position)
-			var snapped_lane: float = find_lane(event.position)
-			var new_note_data: Dictionary = {
-				"time": snapped_time,
-				"lane": snapped_lane,
-				"type": "tap"
-			}
-			add_note(new_note_data)
+			var type: String
+			match selected_layer:
+				LAYER_LOWER:
+					match selected_notetype:
+						"tap_lower":
+							type = "tap" 
+						"hold_start_lower":
+							type = "hold_start"
+						"hold_end_lower":
+							type = "hold_end" 
+						"swipe_lower":
+							type = "swipe"
+						_:
+							print("invalid note type %s for selected layer %s" % [selected_notetype, selected_layer])
+							return
+				LAYER_UPPER:
+					match selected_notetype:
+						"tap_upper":
+							type = "tap" 
+						"hold_start_upper":
+							type = "hold_start" 
+						"hold_end_upper":
+							type = "hold_end"
+						_:
+							print("invalid note type %s for selected layer %s" % [selected_notetype, selected_layer])
+							return
+				LAYER_TIMING:
+					match selected_notetype:
+						"bpm":
+							type = "bpm"
+						"velocity":
+							type = "velocity"
+						_:
+							print("invalid note type %s for selected layer %s" % [selected_notetype, selected_layer])
+							return
+			if selected_layer != LAYER_TIMING:
+				var snapped_lane: float = find_lane(event.position)
+				var new_note_data: Dictionary = {
+					"time": snapped_time,
+					"lane": snapped_lane,
+					"type": type
+				}
+				add_note(new_note_data)
+			else:
+				# TODO: add bpm or velocity change
+				pass
 		if event.button_index == BUTTON_RIGHT and event.pressed:
 			pass
 			
@@ -192,6 +233,7 @@ func _on_Note_gui_input(event, note):
 	if event is InputEventMouseButton:
 		if event.button_index == BUTTON_LEFT and event.pressed:
 			print("note pressed!")
+			# TODO: implement dragging
 		if event.button_index == BUTTON_RIGHT and event.pressed:
 			delete_note(note)
 			
@@ -203,9 +245,8 @@ func add_note(note_data: Dictionary):
 	note_instance.set_data(note_data)
 	var duplicate_note = find_note(note_instance.time, note_instance.lane)
 	if duplicate_note != null:
-		print("duplicate note detected! Deleting old note...")
 		delete_note(duplicate_note)
-	print("adding note with time %s, lane %s" % [note_instance.time, note_instance.lane])
+	print("adding note with time %s, lane %s, type %s" % [note_instance.time, note_instance.lane, note_instance.type])
 	notes.append(note_instance)
 	if note_instance.lane >= 0 and note_instance.lane <= 7:
 		$Lower.add_child(note_instance)
@@ -311,6 +352,7 @@ func _on_SubdivisionOption_subdivision_changed(subdivision):
 
 
 func _on_LayerSelectTabs_tab_selected(name):
+	print("tab selected: ", name)
 	var layers: Array = [
 		{"instance": $Lower, "enable": false},
 		{"instance": $Upper, "enable": false},
@@ -320,18 +362,21 @@ func _on_LayerSelectTabs_tab_selected(name):
 		"Lower":
 			layers[0].enable = true
 			selected_layer = LAYER_LOWER
+			_on_notetype_selected("tap_lower")
 		"Upper":
 			layers[1].enable = true
 			selected_layer = LAYER_UPPER
+			_on_notetype_selected("tap_upper")
 		"Timing":
 			layers[2].enable = true
 			selected_layer = LAYER_TIMING
+			_on_notetype_selected("bpm")
 		_:
 			return
 	for layer in layers:
 		if layer.enable:
 			for child in layer.instance.get_children():
-				child.mouse_filter = MOUSE_FILTER_STOP
+				child.mouse_filter = MOUSE_FILTER_PASS
 		else:
 			for child in layer.instance.get_children():
 				child.mouse_filter = MOUSE_FILTER_IGNORE
@@ -348,13 +393,19 @@ func _on_ZoomMinus_pressed():
 	yield(VisualServer, "frame_post_draw")
 	emit_signal("anchor_scroll", old_scroll_percent, new_length)
 
+
 func _on_ZoomPlus_pressed():
 	if pixels_per_second >= MAX_ZOOM :
 		return
 	pixels_per_second = min(pixels_per_second+ZOOM_INCREMENT, MAX_ZOOM)
 	
 	var old_scroll_percent = (get_parent().scroll_vertical + get_parent().rect_size.y) / rect_size.y
-	update_chart_length(song_length)
 	var new_length = update_chart_length(song_length)
 	yield(VisualServer, "frame_post_draw")
 	emit_signal("anchor_scroll", old_scroll_percent, new_length)
+
+
+func _on_notetype_selected(type: String):
+	selected_notetype = type
+	for notetype_button in get_tree().get_nodes_in_group("notetype_buttons"):
+		notetype_button.set_selected(notetype_button.type == type)

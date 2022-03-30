@@ -3,7 +3,7 @@ class_name Note
 
 var time: float
 var lane: int
-var type: String # "tap" or "hold"
+var type: String # "tap", "hold", or "swipe"
 
 var note_height = 16
 var base_lane_width = 64
@@ -26,7 +26,14 @@ func set_data(note_data: Dictionary):
 	type = note_data.type
 	if lane > 0 and lane < 7:
 		set_size(Vector2(base_lane_width, note_height))
-		note_color = Color(1,1,1,1)
+		#note_color = Color(1,1,1,1)
+		match type:
+			"hold_start":
+				$TextureRect.texture = load("res://images/hold_start.png")
+			"hold_end":
+				$TextureRect.texture = load("res://images/hold_end.png")
+			"tap":
+				$TextureRect.texture = load("res://images/tap.png")
 	elif lane == 0 || lane == 7:
 		set_size(Vector2(base_lane_width, note_height))
 		note_color = Color(1,1,0.1,1)
@@ -35,8 +42,9 @@ func set_data(note_data: Dictionary):
 		note_color = Color(0.13,0.25,1,0.5)
 
 func _draw():
-	var to_draw = Rect2(Vector2(0,0), rect_size)
-	draw_rect(to_draw, note_color)
+	if lane < 1 || lane > 6:
+		var to_draw = Rect2(Vector2(0,0), rect_size)
+		draw_rect(to_draw, note_color)
 
 
 func _on_Note_gui_input(event):

@@ -9,6 +9,7 @@ signal tab_selected(name)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	yield(get_tree(), "idle_frame")
 	_on_custom_tab_selected(0)
 
 
@@ -34,4 +35,4 @@ func _on_custom_tab_selected(index):
 		1:
 			emit_signal("tab_selected", "Upper")
 		2:
-			emit_signal("tab_selected", "Timing")	
+			emit_signal("tab_selected", "Timing")
