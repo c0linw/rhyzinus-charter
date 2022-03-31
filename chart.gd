@@ -17,6 +17,7 @@ var song_length: float = 0
 
 var selected_layer = LAYER_LOWER
 var selected_notetype = "tap_lower" # see notetype_button for enumeration of string types
+var hold_pairs: Array = [] # an array of hold start/end pairs, which will be updated whenever notes are added/deleted
 
 var ObjNote = preload("res://note.tscn")
 
@@ -96,8 +97,7 @@ func _draw():
 		for i in range(5, 7):
 			var divider_rect: Rect2 = Rect2(base_lane_width*i-1, 0, 2, rect_min_size.y)
 			draw_rect(divider_rect, Color(0.4, 0.4, 0.4, 1))
-	
-	
+		
 	# draw beat lines
 	for beat in beats:
 		var thickness
@@ -120,6 +120,12 @@ func _draw():
 	for timing_point in timing_points:
 		var line_rect: Rect2 = Rect2(0, rect_min_size.y-timing_point.time*pixels_per_second-4, rect_size.x, 4)
 		draw_rect(line_rect, Color(1, 0, 0, 1))
+		
+	# draw hold note bodies
+	for pair in hold_pairs:
+		if pair[0].lane < 8:
+			var hold_rect: Rect2 = Rect2(pair[1].rect_position.x, pair[1].rect_position.y + note_height, base_lane_width, (pair[1].time - pair[0].time) * pixels_per_second)
+			draw_rect(hold_rect, Color(1,1,1,0.5))
 			
 func generate_beats(subdivision: int = 4):
 	var data: Array = timing_points.duplicate()
@@ -256,12 +262,18 @@ func add_note(note_data: Dictionary):
 	
 	if note_instance.time <= latest_note_time or duplicate_note != null:
 		notes.sort_custom(TimeSorter, "sort_notes_ascending")
+		
+	hold_pairs = find_hold_pairs(notes)
 	update_note_positions()
+	update()
 		
 func delete_note(note):
 	print("deleting note with time %s, lane %s" % [note.time, note.lane])
 	notes.erase(note)
 	note.queue_free()
+	hold_pairs = find_hold_pairs(notes)
+	update_note_positions()
+	update()
 	
 # returns a note entity, or null
 func find_note(time: float, lane: int):
@@ -343,6 +355,24 @@ func find_lane(position_on_chart: Vector2):
 		return int(floor(position_on_chart.x/base_lane_width))
 	if selected_layer == LAYER_UPPER:
 		return int(floor((position_on_chart.x - base_lane_width)/(base_lane_width*1.5))) + 10
+
+
+# assumes the notes array is sorted by time
+func find_hold_pairs(notes: Array) -> Array:
+	var pairs: Array = [] # an array of pairs of notes
+	var unpaired_starts: Array = []
+	for note in notes:
+		if note.type == "hold_start":
+			unpaired_starts.append(note)
+		if note.type == "hold_end":
+			for hold_start in unpaired_starts:
+				if hold_start.lane == note.lane:
+					pairs.append([hold_start, note])
+					break
+	return pairs
+
+func is_onscreen(instance: Control):
+	return (instance.rect_position.y > get_parent().scroll_vertical) and (instance.rect_position.y < get_parent().scroll_vertical + get_parent().rect_size.y)
 
 
 func _on_SubdivisionOption_subdivision_changed(subdivision):
