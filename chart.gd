@@ -86,10 +86,10 @@ func _draw():
 	draw_rect(Rect2(base_lane_width*7-1, 0, 4, rect_min_size.y), Color(0.4, 0.4, 0.4, 1))
 		
 	# the thinner lines between the left/middle/right lines
-	if selected_layer == LAYER_UPPER || selected_layer == LAYER_TIMING:
+	if selected_layer == LAYER_UPPER:
 		draw_rect(Rect2(base_lane_width*2.5, 0, 2, rect_min_size.y), Color(0.4, 0.4, 0.6, 1))
 		draw_rect(Rect2(base_lane_width*5.5, 0, 2, rect_min_size.y), Color(0.4, 0.4, 0.6, 1))
-	if selected_layer == LAYER_LOWER || selected_layer == LAYER_TIMING:
+	if selected_layer == LAYER_LOWER:
 		for i in range(2, 4):
 			var divider_rect: Rect2 = Rect2(base_lane_width*i-1, 0, 2, rect_min_size.y)
 			draw_rect(divider_rect, Color(0.4, 0.4, 0.4, 1))
@@ -123,9 +123,15 @@ func _draw():
 		
 	# draw hold note bodies
 	for pair in hold_pairs:
-		if pair[0].lane < 8:
+		if pair[0].lane == 0 or pair[0].lane == 7:
+			var hold_rect: Rect2 = Rect2(pair[1].rect_position.x, pair[1].rect_position.y + note_height, base_lane_width, (pair[1].time - pair[0].time) * pixels_per_second)
+			draw_rect(hold_rect, Color(1,1,0,0.5))
+		if pair[0].lane > 0 and pair[0].lane < 7:
 			var hold_rect: Rect2 = Rect2(pair[1].rect_position.x, pair[1].rect_position.y + note_height, base_lane_width, (pair[1].time - pair[0].time) * pixels_per_second)
 			draw_rect(hold_rect, Color(1,1,1,0.5))
+		if pair[0].lane > 9 and pair[0].lane < 14:
+			var hold_rect: Rect2 = Rect2(pair[1].rect_position.x, pair[1].rect_position.y + note_height, base_lane_width*1.5, (pair[1].time - pair[0].time) * pixels_per_second)
+			draw_rect(hold_rect, Color(0.13,0.25,1, 0.4))
 			
 func generate_beats(subdivision: int = 4):
 	var data: Array = timing_points.duplicate()
