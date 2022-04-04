@@ -9,11 +9,12 @@ enum {LAYER_LOWER, LAYER_UPPER, LAYER_TIMING}
 var notes: Array = [] # Array of lower or side note entities
 var timing_points: Array = [] # Array of timing point entities 
 var beats: Array = []
-var pixels_per_second = 512 # determines "vertical" scale of chart display
+var pixels_per_second = 192 # determines "vertical" scale of chart display
 var note_height = 16
 var base_lane_width = 64
 var current_song_position = 0
 var song_length: float = 0
+var current_subdivision: float = 4
 
 var selected_layer = LAYER_LOWER
 var selected_notetype = "tap_lower" # see notetype_button for enumeration of string types
@@ -66,7 +67,7 @@ func _ready():
 	notes.sort_custom(TimeSorter, "sort_notes_ascending")
 	timing_points.sort_custom(TimeSorter, "sort_ascending")
 	
-	beats = generate_beats()
+	beats = generate_beats(current_subdivision)
 	
 	update()
 	update_note_positions()
@@ -133,7 +134,7 @@ func _draw():
 			var hold_rect: Rect2 = Rect2(pair[1].rect_position.x, pair[1].rect_position.y + note_height, base_lane_width*1.5, (pair[1].time - pair[0].time) * pixels_per_second)
 			draw_rect(hold_rect, Color(0.13,0.25,1, 0.4))
 			
-func generate_beats(subdivision: int = 4):
+func generate_beats(subdivision: int):
 	var data: Array = timing_points.duplicate()
 	data.sort_custom(TimeSorter, "sort_ascending")
 	var beat_output: Array = []
@@ -304,7 +305,7 @@ func update_chart_length(audio_length: float) -> float:
 	var new_length = audio_length*pixels_per_second
 	rect_min_size = Vector2(rect_min_size.x, new_length)
 	update()
-	beats = generate_beats()
+	beats = generate_beats(current_subdivision)
 	update_note_positions()
 	return new_length
 	
@@ -382,7 +383,8 @@ func is_onscreen(instance: Control):
 
 
 func _on_SubdivisionOption_subdivision_changed(subdivision):
-	beats = generate_beats(subdivision)
+	current_subdivision = subdivision
+	beats = generate_beats(current_subdivision)
 	print("subdivision changed to %s" % subdivision)
 	update()
 
