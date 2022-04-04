@@ -37,14 +37,25 @@ func set_data(note_data: Dictionary):
 	elif lane == 0 || lane == 7:
 		set_size(Vector2(base_lane_width, note_height))
 		note_color = Color(1,1,0.1,1)
+		match type:
+			"hold_start":
+				$TextureRect.texture = load("res://images/hold_start.png")
+			"hold_end":
+				$TextureRect.texture = load("res://images/hold_end.png")
+			"tap":
+				$TextureRect.texture = load("res://images/tap.png")
+		modulate = note_color
 	elif lane >= 10 and lane <= 13:
 		set_size(Vector2(base_lane_width*1.5, note_height))
+		match type:
+			"hold_start":
+				$TextureRect.texture = load("res://images/hold_start_upper.png")
+			"hold_end":
+				$TextureRect.texture = load("res://images/hold_end_upper.png")
+			"tap":
+				$TextureRect.texture = load("res://images/tap_upper.png")
 		note_color = Color(0.13,0.25,1,0.5)
-
-func _draw():
-	if lane < 1 || lane > 6:
-		var to_draw = Rect2(Vector2(0,0), rect_size)
-		draw_rect(to_draw, note_color)
+	$TextureRect.rect_size = rect_size
 
 
 func _on_Note_gui_input(event):

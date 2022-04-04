@@ -21,7 +21,10 @@ func _ready():
 		"tap_lower": tex = load("res://images/tap.png")
 		"hold_start_lower": tex = load("res://images/hold_start.png")
 		"hold_end_lower": tex = load("res://images/hold_end.png")
-		# TODO: add more note type images
+		"tap_upper": tex = load("res://images/tap_upper.png")
+		"hold_start_upper": tex = load("res://images/hold_start_upper.png")
+		"hold_end_upper": tex = load("res://images/hold_end_upper.png")
+		# TODO: add swipe notes and velocity/bpm
 	$MarginContainer/VBoxContainer/TextureRect.texture = tex
 	$MarginContainer/VBoxContainer/Label.text = type
 
