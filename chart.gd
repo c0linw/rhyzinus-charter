@@ -9,13 +9,16 @@ enum {LAYER_LOWER, LAYER_UPPER, LAYER_TIMING}
 var notes: Array = [] # Array of lower or side note entities
 var timing_points: Array = [] # Array of timing point entities 
 var beats: Array = []
-var pixels_per_second = 512 # determines "vertical" scale of chart display
+var pixels_per_second = 192 # determines "vertical" scale of chart display
 var note_height = 16
 var base_lane_width = 64
 var current_song_position = 0
 var song_length: float = 0
+var current_subdivision: float = 4
 
 var selected_layer = LAYER_LOWER
+var selected_notetype = "tap_lower" # see notetype_button for enumeration of string types
+var hold_pairs: Array = [] # an array of hold start/end pairs, which will be updated whenever notes are added/deleted
 
 var ObjNote = preload("res://note.tscn")
 
@@ -64,7 +67,7 @@ func _ready():
 	notes.sort_custom(TimeSorter, "sort_notes_ascending")
 	timing_points.sort_custom(TimeSorter, "sort_ascending")
 	
-	beats = generate_beats()
+	beats = generate_beats(current_subdivision)
 	
 	update()
 	update_note_positions()
@@ -84,10 +87,10 @@ func _draw():
 	draw_rect(Rect2(base_lane_width*7-1, 0, 4, rect_min_size.y), Color(0.4, 0.4, 0.4, 1))
 		
 	# the thinner lines between the left/middle/right lines
-	if selected_layer == LAYER_UPPER || selected_layer == LAYER_TIMING:
+	if selected_layer == LAYER_UPPER:
 		draw_rect(Rect2(base_lane_width*2.5, 0, 2, rect_min_size.y), Color(0.4, 0.4, 0.6, 1))
 		draw_rect(Rect2(base_lane_width*5.5, 0, 2, rect_min_size.y), Color(0.4, 0.4, 0.6, 1))
-	if selected_layer == LAYER_LOWER || selected_layer == LAYER_TIMING:
+	if selected_layer == LAYER_LOWER:
 		for i in range(2, 4):
 			var divider_rect: Rect2 = Rect2(base_lane_width*i-1, 0, 2, rect_min_size.y)
 			draw_rect(divider_rect, Color(0.4, 0.4, 0.4, 1))
@@ -95,8 +98,7 @@ func _draw():
 		for i in range(5, 7):
 			var divider_rect: Rect2 = Rect2(base_lane_width*i-1, 0, 2, rect_min_size.y)
 			draw_rect(divider_rect, Color(0.4, 0.4, 0.4, 1))
-	
-	
+		
 	# draw beat lines
 	for beat in beats:
 		var thickness
@@ -119,8 +121,20 @@ func _draw():
 	for timing_point in timing_points:
 		var line_rect: Rect2 = Rect2(0, rect_min_size.y-timing_point.time*pixels_per_second-4, rect_size.x, 4)
 		draw_rect(line_rect, Color(1, 0, 0, 1))
+		
+	# draw hold note bodies
+	for pair in hold_pairs:
+		if pair[0].lane == 0 or pair[0].lane == 7:
+			var hold_rect: Rect2 = Rect2(pair[1].rect_position.x, pair[1].rect_position.y + note_height, base_lane_width, (pair[1].time - pair[0].time) * pixels_per_second)
+			draw_rect(hold_rect, Color(1,1,0,0.5))
+		if pair[0].lane > 0 and pair[0].lane < 7:
+			var hold_rect: Rect2 = Rect2(pair[1].rect_position.x, pair[1].rect_position.y + note_height, base_lane_width, (pair[1].time - pair[0].time) * pixels_per_second)
+			draw_rect(hold_rect, Color(1,1,1,0.5))
+		if pair[0].lane > 9 and pair[0].lane < 14:
+			var hold_rect: Rect2 = Rect2(pair[1].rect_position.x, pair[1].rect_position.y + note_height, base_lane_width*1.5, (pair[1].time - pair[0].time) * pixels_per_second)
+			draw_rect(hold_rect, Color(0.13,0.25,1, 0.4))
 			
-func generate_beats(subdivision: int = 4):
+func generate_beats(subdivision: int):
 	var data: Array = timing_points.duplicate()
 	data.sort_custom(TimeSorter, "sort_ascending")
 	var beat_output: Array = []
@@ -177,14 +191,54 @@ func generate_beats(subdivision: int = 4):
 func _on_Chart_gui_input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == BUTTON_LEFT and event.pressed:
+			print("current scroll: ", get_parent().scroll_vertical)
 			var snapped_time: float = find_closest_beat(event.position)
-			var snapped_lane: float = find_lane(event.position)
-			var new_note_data: Dictionary = {
-				"time": snapped_time,
-				"lane": snapped_lane,
-				"type": "tap"
-			}
-			add_note(new_note_data)
+			var type: String
+			match selected_layer:
+				LAYER_LOWER:
+					match selected_notetype:
+						"tap_lower":
+							type = "tap" 
+						"hold_start_lower":
+							type = "hold_start"
+						"hold_end_lower":
+							type = "hold_end" 
+						"swipe_lower":
+							type = "swipe"
+						_:
+							print("invalid note type %s for selected layer %s" % [selected_notetype, selected_layer])
+							return
+				LAYER_UPPER:
+					match selected_notetype:
+						"tap_upper":
+							type = "tap" 
+						"hold_start_upper":
+							type = "hold_start" 
+						"hold_end_upper":
+							type = "hold_end"
+						_:
+							print("invalid note type %s for selected layer %s" % [selected_notetype, selected_layer])
+							return
+				LAYER_TIMING:
+					match selected_notetype:
+						"bpm":
+							type = "bpm"
+						"velocity":
+							type = "velocity"
+						_:
+							print("invalid note type %s for selected layer %s" % [selected_notetype, selected_layer])
+							return
+			if selected_layer != LAYER_TIMING:
+				var snapped_lane: float = find_lane(event.position)
+				var new_note_data: Dictionary = {
+					"time": snapped_time,
+					"lane": snapped_lane,
+					"type": type
+				}
+				add_note(new_note_data)
+			else:
+				# TODO: add bpm or velocity change
+				pass
 		if event.button_index == BUTTON_RIGHT and event.pressed:
 			pass
 			
@@ -192,6 +246,7 @@ func _on_Note_gui_input(event, note):
 	if event is InputEventMouseButton:
 		if event.button_index == BUTTON_LEFT and event.pressed:
 			print("note pressed!")
+			# TODO: implement dragging
 		if event.button_index == BUTTON_RIGHT and event.pressed:
 			delete_note(note)
 			
@@ -203,9 +258,8 @@ func add_note(note_data: Dictionary):
 	note_instance.set_data(note_data)
 	var duplicate_note = find_note(note_instance.time, note_instance.lane)
 	if duplicate_note != null:
-		print("duplicate note detected! Deleting old note...")
 		delete_note(duplicate_note)
-	print("adding note with time %s, lane %s" % [note_instance.time, note_instance.lane])
+	print("adding note with time %s, lane %s, type %s" % [note_instance.time, note_instance.lane, note_instance.type])
 	notes.append(note_instance)
 	if note_instance.lane >= 0 and note_instance.lane <= 7:
 		$Lower.add_child(note_instance)
@@ -215,12 +269,18 @@ func add_note(note_data: Dictionary):
 	
 	if note_instance.time <= latest_note_time or duplicate_note != null:
 		notes.sort_custom(TimeSorter, "sort_notes_ascending")
+		
+	hold_pairs = find_hold_pairs(notes)
 	update_note_positions()
+	update()
 		
 func delete_note(note):
 	print("deleting note with time %s, lane %s" % [note.time, note.lane])
 	notes.erase(note)
 	note.queue_free()
+	hold_pairs = find_hold_pairs(notes)
+	update_note_positions()
+	update()
 	
 # returns a note entity, or null
 func find_note(time: float, lane: int):
@@ -245,7 +305,7 @@ func update_chart_length(audio_length: float) -> float:
 	var new_length = audio_length*pixels_per_second
 	rect_min_size = Vector2(rect_min_size.x, new_length)
 	update()
-	beats = generate_beats()
+	beats = generate_beats(current_subdivision)
 	update_note_positions()
 	return new_length
 	
@@ -304,13 +364,33 @@ func find_lane(position_on_chart: Vector2):
 		return int(floor((position_on_chart.x - base_lane_width)/(base_lane_width*1.5))) + 10
 
 
+# assumes the notes array is sorted by time
+func find_hold_pairs(notes: Array) -> Array:
+	var pairs: Array = [] # an array of pairs of notes
+	var unpaired_starts: Array = []
+	for note in notes:
+		if note.type == "hold_start":
+			unpaired_starts.append(note)
+		if note.type == "hold_end":
+			for hold_start in unpaired_starts:
+				if hold_start.lane == note.lane:
+					pairs.append([hold_start, note])
+					break
+	return pairs
+
+func is_onscreen(instance: Control):
+	return (instance.rect_position.y > get_parent().scroll_vertical) and (instance.rect_position.y < get_parent().scroll_vertical + get_parent().rect_size.y)
+
+
 func _on_SubdivisionOption_subdivision_changed(subdivision):
-	beats = generate_beats(subdivision)
+	current_subdivision = subdivision
+	beats = generate_beats(current_subdivision)
 	print("subdivision changed to %s" % subdivision)
 	update()
 
 
 func _on_LayerSelectTabs_tab_selected(name):
+	print("tab selected: ", name)
 	var layers: Array = [
 		{"instance": $Lower, "enable": false},
 		{"instance": $Upper, "enable": false},
@@ -320,18 +400,21 @@ func _on_LayerSelectTabs_tab_selected(name):
 		"Lower":
 			layers[0].enable = true
 			selected_layer = LAYER_LOWER
+			_on_notetype_selected("tap_lower")
 		"Upper":
 			layers[1].enable = true
 			selected_layer = LAYER_UPPER
+			_on_notetype_selected("tap_upper")
 		"Timing":
 			layers[2].enable = true
 			selected_layer = LAYER_TIMING
+			_on_notetype_selected("bpm")
 		_:
 			return
 	for layer in layers:
 		if layer.enable:
 			for child in layer.instance.get_children():
-				child.mouse_filter = MOUSE_FILTER_STOP
+				child.mouse_filter = MOUSE_FILTER_PASS
 		else:
 			for child in layer.instance.get_children():
 				child.mouse_filter = MOUSE_FILTER_IGNORE
@@ -348,13 +431,19 @@ func _on_ZoomMinus_pressed():
 	yield(VisualServer, "frame_post_draw")
 	emit_signal("anchor_scroll", old_scroll_percent, new_length)
 
+
 func _on_ZoomPlus_pressed():
 	if pixels_per_second >= MAX_ZOOM :
 		return
 	pixels_per_second = min(pixels_per_second+ZOOM_INCREMENT, MAX_ZOOM)
 	
 	var old_scroll_percent = (get_parent().scroll_vertical + get_parent().rect_size.y) / rect_size.y
-	update_chart_length(song_length)
 	var new_length = update_chart_length(song_length)
 	yield(VisualServer, "frame_post_draw")
 	emit_signal("anchor_scroll", old_scroll_percent, new_length)
+
+
+func _on_notetype_selected(type: String):
+	selected_notetype = type
+	for notetype_button in get_tree().get_nodes_in_group("notetype_buttons"):
+		notetype_button.set_selected(notetype_button.type == type)
