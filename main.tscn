@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=2]
+[gd_scene load_steps=20 format=2]
 
 [ext_resource path="res://chart.gd" type="Script" id=1]
 [ext_resource path="res://chart_view.gd" type="Script" id=2]
@@ -87,6 +87,36 @@ corner_radius_bottom_left = 1
 shadow_size = 2
 
 [sub_resource type="StyleBoxFlat" id=7]
+resource_local_to_scene = true
+bg_color = Color( 0.258824, 0.247059, 0.290196, 1 )
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color( 0.290196, 0.27451, 0.32549, 1 )
+border_blend = true
+corner_radius_top_left = 1
+corner_radius_top_right = 1
+corner_radius_bottom_right = 1
+corner_radius_bottom_left = 1
+shadow_size = 2
+
+[sub_resource type="StyleBoxFlat" id=8]
+resource_local_to_scene = true
+bg_color = Color( 0.258824, 0.247059, 0.290196, 1 )
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color( 0.290196, 0.27451, 0.32549, 1 )
+border_blend = true
+corner_radius_top_left = 1
+corner_radius_top_right = 1
+corner_radius_bottom_right = 1
+corner_radius_bottom_left = 1
+shadow_size = 2
+
+[sub_resource type="StyleBoxFlat" id=9]
 resource_local_to_scene = true
 bg_color = Color( 0.258824, 0.247059, 0.290196, 1 )
 border_width_left = 1
@@ -265,11 +295,13 @@ margin_top = 8.0
 margin_right = -4.0
 margin_bottom = -4.0
 
-[node name="ColorRect" type="ColorRect" parent="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs/TabContainer/Timing"]
-margin_right = 64.0
-margin_bottom = 64.0
-rect_min_size = Vector2( 64, 64 )
-color = Color( 0, 0.156863, 1, 1 )
+[node name="BPMSelect" parent="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs/TabContainer/Timing" instance=ExtResource( 10 )]
+custom_styles/panel = SubResource( 8 )
+type = "bpm"
+
+[node name="VelocitySelect" parent="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs/TabContainer/Timing" instance=ExtResource( 10 )]
+custom_styles/panel = SubResource( 9 )
+type = "velocity"
 
 [node name="VerticalTabs" type="VBoxContainer" parent="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs"]
 margin_left = 131.0
@@ -374,6 +406,8 @@ script = ExtResource( 3 )
 [connection signal="notetype_selected" from="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs/TabContainer/Upper/TapUpperSelect" to="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" method="_on_notetype_selected"]
 [connection signal="notetype_selected" from="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs/TabContainer/Upper/HoldStartUpperSelect" to="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" method="_on_notetype_selected"]
 [connection signal="notetype_selected" from="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs/TabContainer/Upper/HoldEndUpperSelect" to="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" method="_on_notetype_selected"]
+[connection signal="notetype_selected" from="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs/TabContainer/Timing/BPMSelect" to="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" method="_on_notetype_selected"]
+[connection signal="notetype_selected" from="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs/TabContainer/Timing/VelocitySelect" to="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" method="_on_notetype_selected"]
 [connection signal="tab_selected" from="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs/VerticalTabs/Lower" to="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs" method="_on_custom_tab_selected"]
 [connection signal="tab_selected" from="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs/VerticalTabs/Upper" to="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs" method="_on_custom_tab_selected"]
 [connection signal="tab_selected" from="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs/VerticalTabs/Timing" to="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs" method="_on_custom_tab_selected"]
