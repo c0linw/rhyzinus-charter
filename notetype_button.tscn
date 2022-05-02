@@ -1,5 +1,6 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
+[ext_resource path="res://timingpoint_button_value.gd" type="Script" id=1]
 [ext_resource path="res://notetype_button.gd" type="Script" id=2]
 
 [sub_resource type="StyleBoxFlat" id=1]
@@ -44,6 +45,22 @@ margin_top = 4.0
 margin_right = 68.0
 margin_bottom = 38.0
 
+[node name="ValueEdit" type="LineEdit" parent="MarginContainer/VBoxContainer"]
+visible = false
+margin_right = 64.0
+margin_bottom = 24.0
+rect_min_size = Vector2( 64, 0 )
+mouse_filter = 2
+mouse_default_cursor_shape = 0
+text = "120.0"
+align = 1
+editable = false
+placeholder_text = "BPM"
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="TextureRect" type="TextureRect" parent="MarginContainer/VBoxContainer"]
 margin_right = 64.0
 margin_bottom = 16.0
@@ -60,3 +77,4 @@ align = 1
 clip_text = true
 
 [connection signal="gui_input" from="." to="." method="_on_PanelContainer_gui_input"]
+[connection signal="text_changed" from="MarginContainer/VBoxContainer/ValueEdit" to="MarginContainer/VBoxContainer/ValueEdit" method="_on_ValueEdit_text_changed"]

@@ -7,7 +7,7 @@ var type: String
 # values related to bpm timing point
 var beat_length: float
 var meter: int
-var bpm_color: Color = Color(1,0,0,1)
+var bpm_color: Color = Color(1,0,1,1)
 
 # values related to velocity timing point
 var velocity: float
