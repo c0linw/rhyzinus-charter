@@ -16,20 +16,30 @@ func setup(type_input: String):
 	type = type_input
 	match type_input:
 		"bpm":
+			placeholder_text = "BPM"
 			add_color_override("font_color", bpm_color)
 			text = "120.0"
+			add_to_group("bpm_timingpoint_value")
 		"velocity":
+			placeholder_text = "Velocity"
 			add_color_override("font_color", velocity_color)
 			text = "1.0"
+			add_to_group("velocity_timingpoint_value")
 	valid = true
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass
 
+func is_valid_timingpoint_value(text: String):
+	if text.is_valid_float():
+		var num: float = float(text)
+		if num > 0:
+			return true
+	return false
 
 func _on_ValueEdit_text_changed(new_text):
-	if not new_text.is_valid_float():
+	if not is_valid_timingpoint_value(new_text):
 		if valid:
 			valid = false
 			add_color_override("font_color", invalid_color)

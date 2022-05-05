@@ -6,8 +6,24 @@
 margin_top = -2.0
 margin_right = 200.0
 margin_bottom = 2.0
-color = Color( 1, 0, 0, 1 )
 script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = -14.0
+rect_min_size = Vector2( 200, 0 )
+mouse_filter = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+bbcode_enabled = true
+bbcode_text = "text"
+meta_underlined = false
+text = "text"
+scroll_active = false
 __meta__ = {
 "_edit_use_anchors_": false
 }

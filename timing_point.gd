@@ -27,9 +27,13 @@ func set_data(timingpoint_data: Dictionary):
 			beat_length = timingpoint_data.beat_length
 			meter = timingpoint_data.meter
 			color = bpm_color
+			$RichTextLabel.add_color_override("default_color", bpm_color)
+			$RichTextLabel.bbcode_text = "%s BPM %s/4" % [60.0/beat_length, meter]
 		"velocity":
 			velocity = timingpoint_data.velocity
 			color = velocity_color
+			$RichTextLabel.add_color_override("default_color", velocity_color)
+			$RichTextLabel.bbcode_text = "[right]%sx[/right]" % velocity
 			
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):

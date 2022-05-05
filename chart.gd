@@ -241,18 +241,34 @@ func _on_Chart_gui_input(event):
 				var new_timingpoint_data: Dictionary
 				match type:
 					"bpm":
-						new_timingpoint_data = {
-							"time": snapped_time,
-							"type": type,
-							"beat_length": 0.333333,
-							"meter": 4
-						}
+						if len(get_tree().get_nodes_in_group("bpm_timingpoint_value")) != 1:
+							push_error("did not find exactly one BPM value input")
+							return
+						var bpm_value_box = get_tree().get_nodes_in_group("bpm_timingpoint_value")[0]
+						if bpm_value_box.valid:
+							var bpm_value = float(bpm_value_box.text)
+							new_timingpoint_data = {
+								"time": snapped_time,
+								"type": type,
+								"beat_length": 60.0 / bpm_value,
+								"meter": 4
+							}
+						else:
+							return
 					"velocity":
-						new_timingpoint_data = {
-							"time": snapped_time,
-							"type": type,
-							"velocity": 1.0,
-						}
+						if len(get_tree().get_nodes_in_group("velocity_timingpoint_value")) != 1:
+							push_error("did not find exactly one velocity value input")
+							return
+						var velocity_value_box = get_tree().get_nodes_in_group("velocity_timingpoint_value")[0]
+						if velocity_value_box.valid:
+							var velocity_value = float(velocity_value_box.text)
+							new_timingpoint_data = {
+								"time": snapped_time,
+								"type": type,
+								"velocity": velocity_value,
+							}
+						else:
+							return
 				add_timingpoint(new_timingpoint_data)
 			else:
 				var snapped_lane: float = find_lane(event.position)
@@ -277,7 +293,7 @@ func _on_TimingPoint_gui_input(event, timingpoint):
 	if event is InputEventMouseButton:
 		if event.button_index == BUTTON_LEFT and event.pressed:
 			print("timing point pressed!")
-			# TODO: implement dragging
+			# TODO: (maybe) implement dragging
 		if event.button_index == BUTTON_RIGHT and event.pressed:
 			delete_timingpoint(timingpoint)
 			
@@ -333,7 +349,10 @@ func add_timingpoint(timingpoint_data: Dictionary):
 	timingpoint_instance.set_data(timingpoint_data)
 	var duplicate_point = find_timingpoint(timingpoint_instance.time, timingpoint_instance.type)
 	if duplicate_point != null:
-		delete_timingpoint(duplicate_point)
+		print("timing point already exists, opening edit window instead")
+		var popup = get_tree().get_nodes_in_group("bpm_timingpoint_dialog")[0]
+		popup.popup()
+		return
 	print("adding timing with time %s, type %s" % [timingpoint_instance.time, timingpoint_instance.type])
 	timing_points.append(timingpoint_instance)
 	$Timing.add_child(timingpoint_instance)
