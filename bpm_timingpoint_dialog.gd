@@ -33,6 +33,12 @@ func is_valid_meter_value(text: String):
 	return false
 
 
+func setup(input_timingpoint_instance):
+	timing_point_instance = input_timingpoint_instance
+	$VBoxContainer/GridContainer/OffsetValue.text = str(timing_point_instance.time)
+	$VBoxContainer/GridContainer/BPMValue.text = str(60.0 / timing_point_instance.beat_length)
+	$VBoxContainer/GridContainer/MeterValue.text = str(timing_point_instance.meter)
+
 func check_inputs() -> bool:
 	var valid = true
 	$VBoxContainer/ErrorMsg.text = ""

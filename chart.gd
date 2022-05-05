@@ -350,8 +350,10 @@ func add_timingpoint(timingpoint_data: Dictionary):
 	var duplicate_point = find_timingpoint(timingpoint_instance.time, timingpoint_instance.type)
 	if duplicate_point != null:
 		print("timing point already exists, opening edit window instead")
-		var popup = get_tree().get_nodes_in_group("bpm_timingpoint_dialog")[0]
-		popup.popup()
+		if duplicate_point.type == "bpm":
+			var dialog = get_tree().get_nodes_in_group("bpm_timingpoint_dialog")[0]
+			dialog.setup(duplicate_point)
+			dialog.popup()
 		return
 	print("adding timing with time %s, type %s" % [timingpoint_instance.time, timingpoint_instance.type])
 	timing_points.append(timingpoint_instance)
@@ -555,3 +557,28 @@ func _on_notetype_selected(type: String):
 	selected_notetype = type
 	for notetype_button in get_tree().get_nodes_in_group("notetype_buttons"):
 		notetype_button.set_selected(notetype_button.type == type)
+
+
+func _on_BPMTimingPointDialog_set_bpm_point(instance, offset, bpm, meter):
+	for timing_point in timing_points:
+		if timing_point == instance:
+			var latest_timingpoint_time = notes[len(timing_points)-1].time if len(timing_points) > 0 else 0
+			
+			var new_data: Dictionary = {
+				"time": offset,
+				"beat_length": 60.0/bpm,
+				"meter": meter,
+				"type": "bpm"
+			}
+			timing_point.set_data(new_data)
+			
+			if timing_point.time <= latest_timingpoint_time:
+				timing_points.sort_custom(TimeSorter, "sort_ascending")
+				
+			beats = generate_beats(current_subdivision)
+			update_timingpoint_positions()
+			update_note_positions()
+			update()
+			
+			get_tree().get_nodes_in_group("bpm_timingpoint_dialog")[0].hide()
+			return

@@ -424,3 +424,4 @@ margin_bottom = 75.5
 [connection signal="tab_selected" from="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs/VerticalTabs/Timing" to="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs" method="_on_custom_tab_selected"]
 [connection signal="anchor_scroll" from="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" to="VBoxContainer/HBoxContainer2/PanelContainer/ChartView" method="_on_Chart_anchor_scroll"]
 [connection signal="gui_input" from="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" to="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" method="_on_Chart_gui_input"]
+[connection signal="set_bpm_point" from="BPMTimingPointDialog" to="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" method="_on_BPMTimingPointDialog_set_bpm_point"]
