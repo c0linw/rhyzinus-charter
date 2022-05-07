@@ -13,9 +13,15 @@ _global_script_classes=[ {
 "class": "Note",
 "language": "GDScript",
 "path": "res://note.gd"
+}, {
+"base": "ColorRect",
+"class": "TimingPoint",
+"language": "GDScript",
+"path": "res://timing_point.gd"
 } ]
 _global_script_class_icons={
-"Note": ""
+"Note": "",
+"TimingPoint": ""
 }
 
 [application]
