@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=2]
+[gd_scene load_steps=22 format=2]
 
 [ext_resource path="res://chart.gd" type="Script" id=1]
 [ext_resource path="res://chart_view.gd" type="Script" id=2]
@@ -11,6 +11,7 @@
 [ext_resource path="res://images/zoom_minus.png" type="Texture" id=9]
 [ext_resource path="res://notetype_button.tscn" type="PackedScene" id=10]
 [ext_resource path="res://bpm_timingpoint_dialog.tscn" type="PackedScene" id=11]
+[ext_resource path="res://dropdown_file_menu.gd" type="Script" id=12]
 
 [sub_resource type="StyleBoxFlat" id=2]
 resource_local_to_scene = true
@@ -155,54 +156,73 @@ __meta__ = {
 
 [node name="PanelContainer" type="PanelContainer" parent="VBoxContainer"]
 margin_right = 1024.0
-margin_bottom = 64.0
+margin_bottom = 94.0
 rect_min_size = Vector2( 0, 64 )
 mouse_filter = 1
 size_flags_horizontal = 3
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/PanelContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/PanelContainer"]
 margin_left = 7.0
 margin_top = 7.0
 margin_right = 1017.0
-margin_bottom = 57.0
+margin_bottom = 87.0
 
-[node name="SubdivisionLabel" type="Label" parent="VBoxContainer/PanelContainer/HBoxContainer"]
-margin_top = 18.0
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer/PanelContainer/VBoxContainer"]
+margin_right = 1010.0
+margin_bottom = 20.0
+
+[node name="DropdownFileMenu" type="MenuButton" parent="VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer2"]
+margin_right = 35.0
+margin_bottom = 20.0
+text = "File"
+items = [ "Save", null, 0, false, false, 0, 0, null, "", false, "Open", null, 0, false, false, 1, 0, null, "", false, "Import .osu file", null, 0, false, false, 2, 0, null, "", false ]
+script = ExtResource( 12 )
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer/PanelContainer/VBoxContainer"]
+margin_top = 24.0
+margin_right = 1010.0
+margin_bottom = 28.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/PanelContainer/VBoxContainer"]
+margin_top = 32.0
+margin_right = 1010.0
+margin_bottom = 80.0
+
+[node name="SubdivisionLabel" type="Label" parent="VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer"]
+margin_top = 17.0
 margin_right = 81.0
-margin_bottom = 32.0
+margin_bottom = 31.0
 text = "Subdivision: "
 
-[node name="SubdivisionOption" type="OptionButton" parent="VBoxContainer/PanelContainer/HBoxContainer"]
+[node name="SubdivisionOption" type="OptionButton" parent="VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer"]
 margin_left = 85.0
-margin_top = 15.0
+margin_top = 14.0
 margin_right = 183.0
-margin_bottom = 35.0
+margin_bottom = 34.0
 size_flags_vertical = 4
 text = "1/4 (16ths)"
 script = ExtResource( 7 )
 
-[node name="ZoomMinus" type="Button" parent="VBoxContainer/PanelContainer/HBoxContainer"]
+[node name="ZoomMinus" type="Button" parent="VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer"]
 margin_left = 187.0
-margin_top = 1.0
 margin_right = 235.0
-margin_bottom = 49.0
+margin_bottom = 48.0
 rect_min_size = Vector2( 48, 48 )
 size_flags_vertical = 4
 icon = ExtResource( 9 )
 expand_icon = true
 
-[node name="ZoomPlus" type="Button" parent="VBoxContainer/PanelContainer/HBoxContainer"]
+[node name="ZoomPlus" type="Button" parent="VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer"]
 margin_left = 239.0
-margin_top = 1.0
 margin_right = 287.0
-margin_bottom = 49.0
+margin_bottom = 48.0
 rect_min_size = Vector2( 48, 48 )
 size_flags_vertical = 4
 icon = ExtResource( 8 )
 expand_icon = true
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
-margin_top = 64.0
+margin_top = 94.0
 margin_right = 1024.0
 margin_bottom = 600.0
 size_flags_horizontal = 3
@@ -211,19 +231,19 @@ custom_constants/separation = 0
 
 [node name="PanelContainer2" type="PanelContainer" parent="VBoxContainer/HBoxContainer2"]
 margin_right = 200.0
-margin_bottom = 536.0
+margin_bottom = 506.0
 rect_min_size = Vector2( 200, 0 )
 
 [node name="LayerSelectTabs" type="HBoxContainer" parent="VBoxContainer/HBoxContainer2/PanelContainer2"]
 margin_left = 7.0
 margin_top = 7.0
 margin_right = 193.0
-margin_bottom = 529.0
+margin_bottom = 499.0
 script = ExtResource( 5 )
 
 [node name="TabContainer" type="TabContainer" parent="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs"]
 margin_right = 127.0
-margin_bottom = 522.0
+margin_bottom = 492.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 tab_align = 0
@@ -307,7 +327,7 @@ type = "velocity"
 [node name="VerticalTabs" type="VBoxContainer" parent="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs"]
 margin_left = 131.0
 margin_right = 186.0
-margin_bottom = 522.0
+margin_bottom = 492.0
 
 [node name="Lower" type="Button" parent="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs/VerticalTabs"]
 margin_right = 55.0
@@ -343,7 +363,7 @@ tab_index = 2
 [node name="PanelContainer" type="PanelContainer" parent="VBoxContainer/HBoxContainer2"]
 margin_left = 200.0
 margin_right = 1024.0
-margin_bottom = 536.0
+margin_bottom = 506.0
 mouse_filter = 1
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -352,7 +372,7 @@ size_flags_vertical = 3
 margin_left = 7.0
 margin_top = 7.0
 margin_right = 539.0
-margin_bottom = 529.0
+margin_bottom = 499.0
 rect_min_size = Vector2( 532, 0 )
 mouse_filter = 1
 size_flags_horizontal = 0
@@ -362,7 +382,7 @@ script = ExtResource( 2 )
 
 [node name="Chart" type="Control" parent="VBoxContainer/HBoxContainer2/PanelContainer/ChartView" groups=["chart"]]
 margin_right = 532.0
-margin_bottom = 522.0
+margin_bottom = 492.0
 grow_vertical = 0
 rect_min_size = Vector2( 480, 0 )
 size_flags_horizontal = 3
@@ -406,10 +426,72 @@ margin_top = -75.5
 margin_right = 94.5
 margin_bottom = 75.5
 
-[connection signal="item_selected" from="VBoxContainer/PanelContainer/HBoxContainer/SubdivisionOption" to="VBoxContainer/PanelContainer/HBoxContainer/SubdivisionOption" method="_on_SubdivisionOption_item_selected"]
-[connection signal="subdivision_changed" from="VBoxContainer/PanelContainer/HBoxContainer/SubdivisionOption" to="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" method="_on_SubdivisionOption_subdivision_changed"]
-[connection signal="pressed" from="VBoxContainer/PanelContainer/HBoxContainer/ZoomMinus" to="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" method="_on_ZoomMinus_pressed"]
-[connection signal="pressed" from="VBoxContainer/PanelContainer/HBoxContainer/ZoomPlus" to="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" method="_on_ZoomPlus_pressed"]
+[node name="ImportOsuDialog" type="FileDialog" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -271.0
+margin_top = -181.0
+margin_right = 271.0
+margin_bottom = 181.0
+popup_exclusive = true
+window_title = "Open a File"
+resizable = true
+mode = 0
+access = 2
+filters = PoolStringArray( "*.osu ; osu!mania beatmaps" )
+show_hidden_files = true
+current_dir = "/Users/wangc/Documents/rhyzinus-charter"
+current_path = "/Users/wangc/Documents/rhyzinus-charter/"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="OpenFileDialog" type="FileDialog" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -271.0
+margin_top = -181.0
+margin_right = 271.0
+margin_bottom = 181.0
+popup_exclusive = true
+window_title = "Open a File"
+resizable = true
+mode = 0
+access = 2
+filters = PoolStringArray( "*.rzn ; Rhyzinus chart files" )
+show_hidden_files = true
+current_dir = "/Users/wangc/Documents/rhyzinus-charter"
+current_path = "/Users/wangc/Documents/rhyzinus-charter/"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="SaveFileDialog" type="FileDialog" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -271.0
+margin_top = -181.0
+margin_right = 271.0
+margin_bottom = 181.0
+access = 2
+filters = PoolStringArray( "*.rzn ; Rhyzinus chart files" )
+show_hidden_files = true
+current_dir = "/Users/wangc/Documents/rhyzinus-charter"
+current_path = "/Users/wangc/Documents/rhyzinus-charter/"
+
+[node name="OsuConverter" type="Node" parent="."]
+
+[connection signal="item_pressed" from="VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer2/DropdownFileMenu" to="." method="_on_DropdownFileMenu_item_pressed"]
+[connection signal="item_selected" from="VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/SubdivisionOption" to="VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/SubdivisionOption" method="_on_SubdivisionOption_item_selected"]
+[connection signal="subdivision_changed" from="VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/SubdivisionOption" to="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" method="_on_SubdivisionOption_subdivision_changed"]
+[connection signal="pressed" from="VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/ZoomMinus" to="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" method="_on_ZoomMinus_pressed"]
+[connection signal="pressed" from="VBoxContainer/PanelContainer/VBoxContainer/HBoxContainer/ZoomPlus" to="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" method="_on_ZoomPlus_pressed"]
 [connection signal="tab_selected" from="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs" to="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" method="_on_LayerSelectTabs_tab_selected"]
 [connection signal="notetype_selected" from="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs/TabContainer/Lower/TapSelect" to="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" method="_on_notetype_selected"]
 [connection signal="notetype_selected" from="VBoxContainer/HBoxContainer2/PanelContainer2/LayerSelectTabs/TabContainer/Lower/HoldStartSelect" to="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" method="_on_notetype_selected"]
@@ -425,3 +507,5 @@ margin_bottom = 75.5
 [connection signal="anchor_scroll" from="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" to="VBoxContainer/HBoxContainer2/PanelContainer/ChartView" method="_on_Chart_anchor_scroll"]
 [connection signal="gui_input" from="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" to="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" method="_on_Chart_gui_input"]
 [connection signal="set_bpm_point" from="BPMTimingPointDialog" to="VBoxContainer/HBoxContainer2/PanelContainer/ChartView/Chart" method="_on_BPMTimingPointDialog_set_bpm_point"]
+[connection signal="file_selected" from="OpenFileDialog" to="." method="_on_OpenFileDialog_file_selected"]
+[connection signal="file_selected" from="SaveFileDialog" to="." method="_on_SaveFileDialog_file_selected"]
