@@ -10,6 +10,11 @@ config_version=4
 
 _global_script_classes=[ {
 "base": "Control",
+"class": "Chart",
+"language": "GDScript",
+"path": "res://chart.gd"
+}, {
+"base": "Control",
 "class": "Note",
 "language": "GDScript",
 "path": "res://note.gd"
@@ -20,6 +25,7 @@ _global_script_classes=[ {
 "path": "res://timing_point.gd"
 } ]
 _global_script_class_icons={
+"Chart": "",
 "Note": "",
 "TimingPoint": ""
 }

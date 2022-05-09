@@ -1,6 +1,6 @@
 extends Control
 
-var chart_node: Control
+var chart_node: Chart
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -22,33 +22,8 @@ func _on_DropdownFileMenu_item_pressed(id):
 
 
 func _on_SaveFileDialog_file_selected(path):
-	var note_data: Array = []
-	for note in chart_node.notes:
-		note_data.append({
-			"time": note.time,
-			"type": note.type,
-			"lane": note.lane,
-		})
-	
-	var timing_data: Array = []
-	for timingpoint in chart_node.timing_points:
-		var timingpoint_data = {
-			"time": timingpoint.time,
-			"type": timingpoint.type,
-		}
-		match timingpoint.type:
-			"bpm": 
-				timingpoint_data["beat_length"] = timingpoint.beat_length
-				timingpoint_data["meter"] = timingpoint.meter
-			"velocity":
-				timingpoint_data["velocity"] = timingpoint.velocity
-		timing_data.append(timingpoint_data)
-	
-	var file_data: Dictionary = {
-		"audio_path": "",
-		"notes": note_data,
-		"timing_points": timing_data
-	}
+	var file_data = chart_node.get_chart_data()
+	file_data["audio_path"] = ""
 	
 	var file = File.new()
 	file.open(path, File.WRITE)
@@ -57,4 +32,14 @@ func _on_SaveFileDialog_file_selected(path):
 
 
 func _on_OpenFileDialog_file_selected(path):
-	pass # Replace with function body.
+	var file = File.new()
+	file.open(path, File.READ)
+	var chart_json = file.get_as_text()
+	var result: JSONParseResult = JSON.parse(chart_json)
+	if result.error != OK:
+		push_error("File parsing failed at line %s: %s" % [result.error_line, result.error_string])
+		return
+	if typeof(result.result) != TYPE_DICTIONARY:
+		push_error("chart data was not parsed as Dictionary")
+		return
+	chart_node.load_chart_data(result.result)
