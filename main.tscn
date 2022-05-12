@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=2]
+[gd_scene load_steps=23 format=2]
 
 [ext_resource path="res://chart.gd" type="Script" id=1]
 [ext_resource path="res://chart_view.gd" type="Script" id=2]
@@ -12,6 +12,7 @@
 [ext_resource path="res://notetype_button.tscn" type="PackedScene" id=10]
 [ext_resource path="res://bpm_timingpoint_dialog.tscn" type="PackedScene" id=11]
 [ext_resource path="res://dropdown_file_menu.gd" type="Script" id=12]
+[ext_resource path="res://fonts/heading-droidsans.tres" type="DynamicFont" id=13]
 
 [sub_resource type="StyleBoxFlat" id=2]
 resource_local_to_scene = true
@@ -134,7 +135,19 @@ corner_radius_bottom_left = 1
 shadow_size = 2
 
 [sub_resource type="StyleBoxFlat" id=1]
-bg_color = Color( 0.105882, 0.113725, 0.12549, 1 )
+resource_local_to_scene = true
+bg_color = Color( 0.258824, 0.247059, 0.290196, 1 )
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color( 0.290196, 0.27451, 0.32549, 1 )
+border_blend = true
+corner_radius_top_left = 1
+corner_radius_top_right = 1
+corner_radius_bottom_right = 1
+corner_radius_bottom_left = 1
+shadow_size = 2
 
 [node name="Control" type="Control"]
 anchor_right = 1.0
@@ -189,7 +202,105 @@ size_flags_vertical = 3
 tab_align = 0
 use_hidden_tabs_for_min_size = true
 
+[node name="Setup" type="MarginContainer" parent="PanelContainer/VBoxContainer/TabContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 32.0
+margin_right = -4.0
+margin_bottom = -4.0
+custom_constants/margin_right = 8
+custom_constants/margin_top = 8
+custom_constants/margin_left = 8
+custom_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/VBoxContainer/TabContainer/Setup"]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 994.0
+margin_bottom = 514.0
+
+[node name="AusioSetupLabel" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer"]
+margin_right = 986.0
+margin_bottom = 24.0
+custom_fonts/font = ExtResource( 13 )
+text = "Audio Setup"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer"]
+margin_top = 28.0
+margin_right = 986.0
+margin_bottom = 52.0
+
+[node name="Label" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/HBoxContainer"]
+margin_top = 5.0
+margin_right = 93.0
+margin_bottom = 19.0
+text = "Audio file path"
+
+[node name="LineEdit" type="LineEdit" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/HBoxContainer"]
+margin_left = 97.0
+margin_right = 155.0
+margin_bottom = 24.0
+
+[node name="HSeparator" type="HSeparator" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer"]
+margin_top = 56.0
+margin_right = 986.0
+margin_bottom = 72.0
+custom_constants/separation = 16
+
+[node name="TimingSetupLabel" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer"]
+margin_top = 76.0
+margin_right = 986.0
+margin_bottom = 100.0
+custom_fonts/font = ExtResource( 13 )
+text = "Initial Timing Point Setup"
+
+[node name="GridContainer" type="GridContainer" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer"]
+margin_top = 104.0
+margin_right = 986.0
+margin_bottom = 184.0
+columns = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/GridContainer"]
+margin_top = 5.0
+margin_right = 38.0
+margin_bottom = 19.0
+text = "Time"
+
+[node name="LineEdit" type="LineEdit" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/GridContainer"]
+margin_left = 42.0
+margin_right = 100.0
+margin_bottom = 24.0
+
+[node name="Label2" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/GridContainer"]
+margin_top = 33.0
+margin_right = 38.0
+margin_bottom = 47.0
+text = "BPM"
+
+[node name="LineEdit2" type="LineEdit" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/GridContainer"]
+margin_left = 42.0
+margin_top = 28.0
+margin_right = 100.0
+margin_bottom = 52.0
+
+[node name="Label3" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/GridContainer"]
+margin_top = 61.0
+margin_right = 38.0
+margin_bottom = 75.0
+text = "Meter"
+
+[node name="LineEdit3" type="LineEdit" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/GridContainer"]
+margin_left = 42.0
+margin_top = 56.0
+margin_right = 100.0
+margin_bottom = 80.0
+
 [node name="Edit" type="VBoxContainer" parent="PanelContainer/VBoxContainer/TabContainer"]
+visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 4.0
@@ -392,8 +503,10 @@ custom_styles/bg = SubResource( 1 )
 script = ExtResource( 2 )
 
 [node name="Chart" type="Control" parent="PanelContainer/VBoxContainer/TabContainer/Edit/HBoxContainer/PanelContainer/ChartView" groups=["chart"]]
-margin_right = 532.0
-margin_bottom = 456.0
+margin_left = 1.0
+margin_top = 1.0
+margin_right = 531.0
+margin_bottom = 455.0
 grow_vertical = 0
 rect_min_size = Vector2( 480, 0 )
 size_flags_horizontal = 3
