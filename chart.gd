@@ -1,4 +1,5 @@
 extends Control
+class_name Chart
 
 const ZOOM_INCREMENT = 64
 const MAX_ZOOM = 1024
@@ -582,3 +583,48 @@ func _on_BPMTimingPointDialog_set_bpm_point(instance, offset, bpm, meter):
 			
 			get_tree().get_nodes_in_group("bpm_timingpoint_dialog")[0].hide()
 			return
+
+
+func get_chart_data() -> Dictionary:
+	var note_data: Array = []
+	for note in notes:
+		note_data.append({
+			"time": note.time,
+			"type": note.type,
+			"lane": note.lane,
+		})
+	
+	var timing_data: Array = []
+	for timingpoint in timing_points:
+		var timingpoint_data = {
+			"time": timingpoint.time,
+			"type": timingpoint.type,
+		}
+		match timingpoint.type:
+			"bpm": 
+				timingpoint_data["beat_length"] = timingpoint.beat_length
+				timingpoint_data["meter"] = timingpoint.meter
+			"velocity":
+				timingpoint_data["velocity"] = timingpoint.velocity
+		timing_data.append(timingpoint_data)
+	
+	var chart_data: Dictionary = {
+		"notes": note_data,
+		"timing_points": timing_data
+	}
+	return chart_data
+	
+
+func load_chart_data(chart_data: Dictionary):
+	for note in notes:
+		note.queue_free()
+	for timingpoint in timing_points:
+		timingpoint.queue_free()
+	notes = []
+	timing_points = []
+	
+	# TODO: optimize by not calling add_note and add_timingpoint repeatedly
+	for note_data in chart_data.notes:
+		add_note(note_data)
+	for timingpoint_data in chart_data.timing_points:
+		add_timingpoint(timingpoint_data)
