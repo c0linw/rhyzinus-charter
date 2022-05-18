@@ -483,9 +483,11 @@ func find_hold_pairs(notes: Array) -> Array:
 		if note.type == "hold_start":
 			unpaired_starts.append(note)
 		if note.type == "hold_end":
-			for hold_start in unpaired_starts:
+			for i in len(unpaired_starts):
+				var hold_start = unpaired_starts[i]
 				if hold_start.lane == note.lane:
 					pairs.append([hold_start, note])
+					unpaired_starts.remove(i)
 					break
 	return pairs
 
