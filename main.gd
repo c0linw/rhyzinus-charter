@@ -43,3 +43,11 @@ func _on_OpenFileDialog_file_selected(path):
 		push_error("chart data was not parsed as Dictionary")
 		return
 	chart_node.load_chart_data(result.result)
+
+
+func _on_ImportOsuDialog_file_selected(path):
+	var result = $OsuConverter.load_chart(path)
+	if result == null:
+		push_error(".osu chart loading failed")
+		return
+	chart_node.load_chart_data(result)
