@@ -87,8 +87,8 @@ func _ready():
 	update_timingpoint_positions()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
+func _process(delta):
+	update_playhead()
 
 func _draw():
 	# draw lane divisions
@@ -428,6 +428,12 @@ func update_timingpoint_positions():
 		elif timingpoint.type == "velocity":
 			timingpoint.set_position(Vector2(rect_size.x/2 - 4, y))
 		timingpoint.rect_size.x = rect_size.x/2 - 4
+		
+func chart_position_to_time(y: float) -> float:
+	 return (rect_min_size.y - y) / pixels_per_second
+	
+func time_to_chart_position(time: float) -> float:
+	return rect_min_size.y - time*pixels_per_second
 
 func find_closest_beat(position_on_chart: Vector2):
 	# modified binary search
@@ -493,6 +499,11 @@ func find_hold_pairs(notes: Array) -> Array:
 
 func is_onscreen(instance: Control):
 	return (instance.rect_position.y > get_parent().scroll_vertical) and (instance.rect_position.y < get_parent().scroll_vertical + get_parent().rect_size.y)
+
+
+func update_playhead():
+	pass
+	#$Playhead.set_position(Vector2(0,0))
 
 
 func _on_SubdivisionOption_subdivision_changed(subdivision):

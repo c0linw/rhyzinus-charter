@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=2]
+[gd_scene load_steps=25 format=2]
 
 [ext_resource path="res://chart.gd" type="Script" id=1]
 [ext_resource path="res://chart_view.gd" type="Script" id=2]
@@ -14,6 +14,7 @@
 [ext_resource path="res://dropdown_file_menu.gd" type="Script" id=12]
 [ext_resource path="res://fonts/heading-droidsans.tres" type="DynamicFont" id=13]
 [ext_resource path="res://osu_converter.gd" type="Script" id=14]
+[ext_resource path="res://loadscreen.gd" type="Script" id=15]
 
 [sub_resource type="StyleBoxFlat" id=2]
 resource_local_to_scene = true
@@ -203,105 +204,7 @@ size_flags_vertical = 3
 tab_align = 0
 use_hidden_tabs_for_min_size = true
 
-[node name="Setup" type="MarginContainer" parent="PanelContainer/VBoxContainer/TabContainer"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = 4.0
-margin_top = 32.0
-margin_right = -4.0
-margin_bottom = -4.0
-custom_constants/margin_right = 8
-custom_constants/margin_top = 8
-custom_constants/margin_left = 8
-custom_constants/margin_bottom = 8
-
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/VBoxContainer/TabContainer/Setup"]
-margin_left = 8.0
-margin_top = 8.0
-margin_right = 994.0
-margin_bottom = 514.0
-
-[node name="AusioSetupLabel" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer"]
-margin_right = 986.0
-margin_bottom = 24.0
-custom_fonts/font = ExtResource( 13 )
-text = "Audio Setup"
-
-[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer"]
-margin_top = 28.0
-margin_right = 986.0
-margin_bottom = 52.0
-
-[node name="Label" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/HBoxContainer"]
-margin_top = 5.0
-margin_right = 93.0
-margin_bottom = 19.0
-text = "Audio file path"
-
-[node name="LineEdit" type="LineEdit" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/HBoxContainer"]
-margin_left = 97.0
-margin_right = 155.0
-margin_bottom = 24.0
-
-[node name="HSeparator" type="HSeparator" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer"]
-margin_top = 56.0
-margin_right = 986.0
-margin_bottom = 72.0
-custom_constants/separation = 16
-
-[node name="TimingSetupLabel" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer"]
-margin_top = 76.0
-margin_right = 986.0
-margin_bottom = 100.0
-custom_fonts/font = ExtResource( 13 )
-text = "Initial Timing Point Setup"
-
-[node name="GridContainer" type="GridContainer" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer"]
-margin_top = 104.0
-margin_right = 986.0
-margin_bottom = 184.0
-columns = 2
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Label" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/GridContainer"]
-margin_top = 5.0
-margin_right = 38.0
-margin_bottom = 19.0
-text = "Time"
-
-[node name="LineEdit" type="LineEdit" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/GridContainer"]
-margin_left = 42.0
-margin_right = 100.0
-margin_bottom = 24.0
-
-[node name="Label2" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/GridContainer"]
-margin_top = 33.0
-margin_right = 38.0
-margin_bottom = 47.0
-text = "BPM"
-
-[node name="LineEdit2" type="LineEdit" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/GridContainer"]
-margin_left = 42.0
-margin_top = 28.0
-margin_right = 100.0
-margin_bottom = 52.0
-
-[node name="Label3" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/GridContainer"]
-margin_top = 61.0
-margin_right = 38.0
-margin_bottom = 75.0
-text = "Meter"
-
-[node name="LineEdit3" type="LineEdit" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/GridContainer"]
-margin_left = 42.0
-margin_top = 56.0
-margin_right = 100.0
-margin_bottom = 80.0
-
 [node name="Edit" type="VBoxContainer" parent="PanelContainer/VBoxContainer/TabContainer"]
-visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 4.0
@@ -349,6 +252,12 @@ rect_min_size = Vector2( 48, 48 )
 size_flags_vertical = 4
 icon = ExtResource( 8 )
 expand_icon = true
+
+[node name="PlayButton" type="Button" parent="PanelContainer/VBoxContainer/TabContainer/Edit/VBoxContainer/HBoxContainer"]
+margin_left = 291.0
+margin_right = 329.0
+margin_bottom = 48.0
+text = "Play"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer/TabContainer/Edit"]
 margin_top = 52.0
@@ -538,6 +447,130 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="Playhead" type="ColorRect" parent="PanelContainer/VBoxContainer/TabContainer/Edit/HBoxContainer/PanelContainer/ChartView/Chart"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -265.0
+margin_top = -2.0
+margin_right = 265.0
+margin_bottom = 2.0
+rect_min_size = Vector2( 0, 4 )
+size_flags_horizontal = 3
+color = Color( 1, 0, 0, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Setup" type="MarginContainer" parent="PanelContainer/VBoxContainer/TabContainer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 32.0
+margin_right = -4.0
+margin_bottom = -4.0
+custom_constants/margin_right = 8
+custom_constants/margin_top = 8
+custom_constants/margin_left = 8
+custom_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/VBoxContainer/TabContainer/Setup"]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 994.0
+margin_bottom = 514.0
+
+[node name="AusioSetupLabel" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer"]
+margin_right = 986.0
+margin_bottom = 24.0
+custom_fonts/font = ExtResource( 13 )
+text = "Audio Setup"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer"]
+margin_top = 28.0
+margin_right = 986.0
+margin_bottom = 52.0
+
+[node name="Label" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/HBoxContainer"]
+margin_top = 5.0
+margin_right = 93.0
+margin_bottom = 19.0
+text = "Audio file path"
+
+[node name="LineEdit" type="LineEdit" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/HBoxContainer"]
+margin_left = 97.0
+margin_right = 225.0
+margin_bottom = 24.0
+rect_min_size = Vector2( 128, 0 )
+
+[node name="Button" type="Button" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/HBoxContainer"]
+margin_left = 229.0
+margin_right = 307.0
+margin_bottom = 24.0
+text = "Select File"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HSeparator" type="HSeparator" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer"]
+margin_top = 56.0
+margin_right = 986.0
+margin_bottom = 72.0
+custom_constants/separation = 16
+
+[node name="TimingSetupLabel" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer"]
+margin_top = 76.0
+margin_right = 986.0
+margin_bottom = 100.0
+custom_fonts/font = ExtResource( 13 )
+text = "Initial Timing Point Setup"
+
+[node name="GridContainer" type="GridContainer" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer"]
+margin_top = 104.0
+margin_right = 986.0
+margin_bottom = 184.0
+columns = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/GridContainer"]
+margin_top = 5.0
+margin_right = 38.0
+margin_bottom = 19.0
+text = "Time"
+
+[node name="LineEdit" type="LineEdit" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/GridContainer"]
+margin_left = 42.0
+margin_right = 100.0
+margin_bottom = 24.0
+
+[node name="Label2" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/GridContainer"]
+margin_top = 33.0
+margin_right = 38.0
+margin_bottom = 47.0
+text = "BPM"
+
+[node name="LineEdit2" type="LineEdit" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/GridContainer"]
+margin_left = 42.0
+margin_top = 28.0
+margin_right = 100.0
+margin_bottom = 52.0
+
+[node name="Label3" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/GridContainer"]
+margin_top = 61.0
+margin_right = 38.0
+margin_bottom = 75.0
+text = "Meter"
+
+[node name="LineEdit3" type="LineEdit" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/GridContainer"]
+margin_left = 42.0
+margin_top = 56.0
+margin_right = 100.0
+margin_bottom = 80.0
+
 [node name="SongAudioPlayer" type="AudioStreamPlayer" parent="."]
 script = ExtResource( 3 )
 
@@ -613,11 +646,21 @@ current_path = "/Users/wangc/Documents/rhyzinus-charter/"
 [node name="OsuConverter" type="Node" parent="."]
 script = ExtResource( 14 )
 
+[node name="Loadscreen" type="PanelContainer" parent="."]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 15 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [connection signal="item_pressed" from="PanelContainer/VBoxContainer/HBoxContainer2/DropdownFileMenu" to="." method="_on_DropdownFileMenu_item_pressed"]
 [connection signal="item_selected" from="PanelContainer/VBoxContainer/TabContainer/Edit/VBoxContainer/HBoxContainer/SubdivisionOption" to="PanelContainer/VBoxContainer/TabContainer/Edit/VBoxContainer/HBoxContainer/SubdivisionOption" method="_on_SubdivisionOption_item_selected"]
 [connection signal="subdivision_changed" from="PanelContainer/VBoxContainer/TabContainer/Edit/VBoxContainer/HBoxContainer/SubdivisionOption" to="PanelContainer/VBoxContainer/TabContainer/Edit/HBoxContainer/PanelContainer/ChartView/Chart" method="_on_SubdivisionOption_subdivision_changed"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/TabContainer/Edit/VBoxContainer/HBoxContainer/ZoomMinus" to="PanelContainer/VBoxContainer/TabContainer/Edit/HBoxContainer/PanelContainer/ChartView/Chart" method="_on_ZoomMinus_pressed"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/TabContainer/Edit/VBoxContainer/HBoxContainer/ZoomPlus" to="PanelContainer/VBoxContainer/TabContainer/Edit/HBoxContainer/PanelContainer/ChartView/Chart" method="_on_ZoomPlus_pressed"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/TabContainer/Edit/VBoxContainer/HBoxContainer/PlayButton" to="." method="_on_PlayButton_pressed"]
 [connection signal="tab_selected" from="PanelContainer/VBoxContainer/TabContainer/Edit/HBoxContainer/LayerSelectTabs" to="PanelContainer/VBoxContainer/TabContainer/Edit/HBoxContainer/PanelContainer/ChartView/Chart" method="_on_LayerSelectTabs_tab_selected"]
 [connection signal="notetype_selected" from="PanelContainer/VBoxContainer/TabContainer/Edit/HBoxContainer/LayerSelectTabs/TabContainer/Lower/TapSelect" to="PanelContainer/VBoxContainer/TabContainer/Edit/HBoxContainer/PanelContainer/ChartView/Chart" method="_on_notetype_selected"]
 [connection signal="notetype_selected" from="PanelContainer/VBoxContainer/TabContainer/Edit/HBoxContainer/LayerSelectTabs/TabContainer/Lower/HoldStartSelect" to="PanelContainer/VBoxContainer/TabContainer/Edit/HBoxContainer/PanelContainer/ChartView/Chart" method="_on_notetype_selected"]

@@ -7,6 +7,9 @@ func _ready():
 	$SongAudioPlayer.stream = load("res://songs/neutralizeptbmix/audio.mp3")
 	chart_node = find_node("Chart")
 	chart_node.update_chart_length($SongAudioPlayer.stream.get_length())
+	yield(VisualServer, "frame_post_draw")
+	$Loadscreen.visible = false
+	$PanelContainer/VBoxContainer/TabContainer.set_current_tab(1)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -51,3 +54,10 @@ func _on_ImportOsuDialog_file_selected(path):
 		push_error(".osu chart loading failed")
 		return
 	chart_node.load_chart_data(result)
+
+
+func _on_PlayButton_pressed():
+	if $SongAudioPlayer.playing:
+		$SongAudioPlayer.stop()
+	else:
+		$SongAudioPlayer.play(0.0) # TODO: play based on cursor position
