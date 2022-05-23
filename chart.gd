@@ -23,6 +23,7 @@ var hold_pairs: Array = [] # an array of hold start/end pairs, which will be upd
 
 var ObjNote = preload("res://note.tscn")
 var ObjTimingPoint = preload("res://timing_point.tscn")
+var SongAudioPlayer: AudioStreamPlayer # root node will set this
 
 signal anchor_scroll(percentage, new_size)
 
@@ -502,8 +503,10 @@ func is_onscreen(instance: Control):
 
 
 func update_playhead():
-	pass
-	#$Playhead.set_position(Vector2(0,0))
+	if SongAudioPlayer == null or not SongAudioPlayer.playing:
+		pass # update based on mouse coords
+	else:
+		$Playhead.rect_position.y = time_to_chart_position(SongAudioPlayer.song_position)
 
 
 func _on_SubdivisionOption_subdivision_changed(subdivision):

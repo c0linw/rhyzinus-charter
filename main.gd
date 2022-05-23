@@ -10,6 +10,7 @@ func _ready():
 	yield(VisualServer, "frame_post_draw")
 	$Loadscreen.visible = false
 	$PanelContainer/VBoxContainer/TabContainer.set_current_tab(1)
+	chart_node.SongAudioPlayer = $SongAudioPlayer
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
