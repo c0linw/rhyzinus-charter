@@ -61,4 +61,12 @@ func _on_PlayButton_pressed():
 	if $SongAudioPlayer.playing:
 		$SongAudioPlayer.stop()
 	else:
-		$SongAudioPlayer.play(0.0) # TODO: play based on cursor position
+		var speed_option_node = find_node("PlaySpeedOption")
+		var playback_speed = 1.0
+		if speed_option_node != null:
+			playback_speed = float(speed_option_node.text)
+		$SongAudioPlayer.play_with_parameters(0.0, playback_speed) # TODO: play based on cursor position
+
+
+func _on_VolumeSpinBox_value_changed(value):
+	$SongAudioPlayer.volume_db = linear2db(value/100.0)

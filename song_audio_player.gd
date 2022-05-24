@@ -19,3 +19,7 @@ func update_song_position():
 		new_position -= AudioServer.get_output_latency()
 		if new_position > song_position:
 			song_position = new_position
+
+func play_with_parameters(from_position: float, speed: float):
+	pitch_scale = speed
+	play(from_position)
