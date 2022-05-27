@@ -1,6 +1,7 @@
 extends Control
 
 var chart_node: Chart
+signal stream_changed(songaudioplayer)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -59,13 +60,13 @@ func _on_ImportOsuDialog_file_selected(path):
 
 func _on_PlayButton_pressed():
 	if $SongAudioPlayer.playing:
-		$SongAudioPlayer.stop()
+		$SongAudioPlayer.pause()
 	else:
 		var speed_option_node = find_node("PlaySpeedOption")
 		var playback_speed = 1.0
 		if speed_option_node != null:
 			playback_speed = float(speed_option_node.text)
-		$SongAudioPlayer.play_with_parameters(0.0, playback_speed) # TODO: play based on cursor position
+		$SongAudioPlayer.play_with_parameters($SongAudioPlayer.song_position, playback_speed) # TODO: play based on cursor position
 
 
 func _on_VolumeSpinBox_value_changed(value):

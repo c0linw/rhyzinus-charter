@@ -26,6 +26,7 @@ var ObjTimingPoint = preload("res://timing_point.tscn")
 var SongAudioPlayer: AudioStreamPlayer # root node will set this
 
 signal anchor_scroll(percentage, new_size)
+signal custom_scroll(dir_multiplier) # up is 1, down is -1
 
 enum BeatType {MEASURE, BEAT, SUBDIVISION}
 
@@ -55,22 +56,6 @@ class TimeSorter:
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	for i in range(0, 8):
-		var note_data: Dictionary = {
-			"time": i*0.5,
-			"lane": i,
-			"type": "tap"
-		}
-		add_note(note_data)
-		
-	for i in range(10,14):
-		var note_data: Dictionary = {
-			"time": i-10,
-			"lane": i,
-			"type": "tap"
-		}
-		add_note(note_data)
-		
 	add_timingpoint({
 		"time": 0,
 		"beat_length": 0.5,
@@ -88,8 +73,8 @@ func _ready():
 	update_timingpoint_positions()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	update_playhead()
+# func _process(delta):
+#	pass
 
 func _draw():
 	# draw lane divisions
@@ -282,6 +267,10 @@ func _on_Chart_gui_input(event):
 				add_note(new_note_data)
 		if event.button_index == BUTTON_RIGHT and event.pressed:
 			pass
+		if event.button_index == BUTTON_WHEEL_DOWN and event.pressed:
+			emit_signal("custom_scroll", -1)
+		if event.button_index == BUTTON_WHEEL_UP and event.pressed:
+			emit_signal("custom_scroll", 1)
 			
 func _on_Note_gui_input(event, note):
 	if event is InputEventMouseButton:
@@ -500,13 +489,6 @@ func find_hold_pairs(notes: Array) -> Array:
 
 func is_onscreen(instance: Control):
 	return (instance.rect_position.y > get_parent().scroll_vertical) and (instance.rect_position.y < get_parent().scroll_vertical + get_parent().rect_size.y)
-
-
-func update_playhead():
-	if SongAudioPlayer == null or not SongAudioPlayer.playing:
-		pass # update based on mouse coords
-	else:
-		$Playhead.rect_position.y = time_to_chart_position(SongAudioPlayer.song_position)
 
 
 func _on_SubdivisionOption_subdivision_changed(subdivision):
