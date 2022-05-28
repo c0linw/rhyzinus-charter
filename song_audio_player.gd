@@ -39,7 +39,7 @@ func unpause():
 
 
 func _on_Chart_custom_scroll(dir_multiplier):
-	var new_position = song_position + 0.5*dir_multiplier
+	var new_position = song_position + 1.0*dir_multiplier
 	seek(new_position)
 	song_position = new_position
 	emit_signal("song_position_updated", song_position, stream.get_length())

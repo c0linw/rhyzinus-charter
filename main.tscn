@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=2]
+[gd_scene load_steps=29 format=2]
 
 [ext_resource path="res://chart.gd" type="Script" id=1]
 [ext_resource path="res://chart_view.gd" type="Script" id=2]
@@ -17,6 +17,7 @@
 [ext_resource path="res://loadscreen.gd" type="Script" id=15]
 [ext_resource path="res://playback_slider_input.gd" type="Script" id=16]
 [ext_resource path="res://playback_slider_display.gd" type="Script" id=17]
+[ext_resource path="res://playback_time_label.gd" type="Script" id=18]
 
 [sub_resource type="StyleBoxFlat" id=2]
 resource_local_to_scene = true
@@ -519,11 +520,10 @@ margin_right = 1002.0
 margin_bottom = 522.0
 custom_constants/margin_right = 32
 custom_constants/margin_top = 8
-custom_constants/margin_left = 32
+custom_constants/margin_left = 0
 custom_constants/margin_bottom = 4
 
 [node name="PlaybackHBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer/TabContainer/Edit/MarginContainer"]
-margin_left = 32.0
 margin_top = 8.0
 margin_right = 970.0
 margin_bottom = 28.0
@@ -531,13 +531,17 @@ alignment = 1
 
 [node name="PlaybackTimeLabel" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Edit/MarginContainer/PlaybackHBoxContainer"]
 margin_top = 3.0
-margin_right = 56.0
+margin_right = 150.0
 margin_bottom = 17.0
-text = "0:00.000"
+rect_min_size = Vector2( 150, 0 )
+text = "0:00.000 / 0:00.000"
+align = 2
+clip_text = true
+script = ExtResource( 18 )
 
 [node name="MarginContainer" type="MarginContainer" parent="PanelContainer/VBoxContainer/TabContainer/Edit/MarginContainer/PlaybackHBoxContainer"]
-margin_left = 60.0
-margin_right = 853.0
+margin_left = 154.0
+margin_right = 885.0
 margin_bottom = 20.0
 size_flags_horizontal = 3
 custom_constants/margin_right = 8
@@ -547,7 +551,7 @@ custom_constants/margin_left = 8
 modulate = Color( 1, 1, 1, 0 )
 margin_left = 8.0
 margin_top = 2.0
-margin_right = 785.0
+margin_right = 723.0
 margin_bottom = 18.0
 size_flags_horizontal = 3
 size_flags_vertical = 4
@@ -561,7 +565,7 @@ __meta__ = {
 [node name="PlaybackSliderDisplay" type="HSlider" parent="PanelContainer/VBoxContainer/TabContainer/Edit/MarginContainer/PlaybackHBoxContainer/MarginContainer"]
 margin_left = 8.0
 margin_top = 2.0
-margin_right = 785.0
+margin_right = 723.0
 margin_bottom = 18.0
 mouse_filter = 2
 size_flags_horizontal = 3
@@ -571,8 +575,8 @@ scrollable = false
 script = ExtResource( 17 )
 
 [node name="PlayButton" type="Button" parent="PanelContainer/VBoxContainer/TabContainer/Edit/MarginContainer/PlaybackHBoxContainer"]
-margin_left = 857.0
-margin_right = 938.0
+margin_left = 889.0
+margin_right = 970.0
 margin_bottom = 20.0
 text = "Play/Pause"
 
@@ -794,6 +798,7 @@ __meta__ = {
 [connection signal="playback_scrub" from="PanelContainer/VBoxContainer/TabContainer/Edit/MarginContainer/PlaybackHBoxContainer/MarginContainer/PlaybackSliderDisplay" to="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer/ChartView" method="_on_PlaybackSliderDisplay_playback_scrub"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/TabContainer/Edit/MarginContainer/PlaybackHBoxContainer/PlayButton" to="." method="_on_PlayButton_pressed"]
 [connection signal="song_position_updated" from="SongAudioPlayer" to="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer/ChartView" method="_on_SongAudioPlayer_song_position_updated"]
+[connection signal="song_position_updated" from="SongAudioPlayer" to="PanelContainer/VBoxContainer/TabContainer/Edit/MarginContainer/PlaybackHBoxContainer/PlaybackTimeLabel" method="_on_SongAudioPlayer_song_position_updated"]
 [connection signal="song_position_updated" from="SongAudioPlayer" to="PanelContainer/VBoxContainer/TabContainer/Edit/MarginContainer/PlaybackHBoxContainer/MarginContainer/PlaybackSliderDisplay" method="_on_SongAudioPlayer_song_position_updated"]
 [connection signal="set_bpm_point" from="BPMTimingPointDialog" to="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer/ChartView/Chart" method="_on_BPMTimingPointDialog_set_bpm_point"]
 [connection signal="file_selected" from="ImportOsuDialog" to="." method="_on_ImportOsuDialog_file_selected"]
