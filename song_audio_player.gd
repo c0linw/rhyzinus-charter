@@ -1,15 +1,33 @@
 extends AudioStreamPlayer
 
+const BUS_NAME = "Pitch"
+const BUS_INDEX = 1
+const EFF_INDEX = 0
 
 var song_position: float = 0.0
 var paused_position: float = 0.0
 
 signal song_position_updated(new_position, max_position)
+signal audio_loaded(new_length)
 
 # Called when the node enters the scene tree for the first time.
-#func _ready():
-	#stream = load("res://songs/neutralizeptbmix/audio.mp3")
+func _ready():
+	var shift = AudioEffectPitchShift.new()
+	shift.pitch_scale = 1.0
+	
+	AudioServer.add_bus(BUS_INDEX)
+	AudioServer.set_bus_name(BUS_INDEX, BUS_NAME)
+	AudioServer.add_bus_effect(BUS_INDEX, shift, EFF_INDEX)
+	bus = BUS_NAME
+	
 
+func load_audio(path: String):
+	stream = load(path)
+	song_position = 0.0
+	paused_position = 0.0
+	seek(song_position)
+	emit_signal("audio_loaded", stream.get_length())
+	emit_signal("song_position_updated", song_position, stream.get_length())
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -24,7 +42,13 @@ func update_song_position():
 			emit_signal("song_position_updated", song_position, stream.get_length())
 
 func play_with_parameters(from_position: float, speed: float):
-	pitch_scale = speed
+	# AudioStreamPlayer's pitch_scale modifies the speed AND the pitch
+	pitch_scale = speed 
+	
+	# to compensate, use an inverse pitch shift effect 
+	var shift = AudioServer.get_bus_effect(BUS_INDEX, EFF_INDEX)
+	shift.pitch_scale = 1.0/speed
+	
 	play(from_position)
 	
 func stop():

@@ -626,3 +626,7 @@ func load_chart_data(chart_data: Dictionary):
 		add_note(note_data)
 	for timingpoint_data in chart_data.timing_points:
 		add_timingpoint(timingpoint_data)
+
+
+func _on_SongAudioPlayer_audio_loaded(new_length):
+	update_chart_length(new_length)

@@ -21,9 +21,10 @@ func _ready():
 
 func _on_DropdownFileMenu_item_pressed(id):
 	match id:
-		0: $SaveFileDialog.popup_centered()
-		1: $OpenFileDialog.popup_centered() # open .rzn file
-		2: $ImportOsuDialog.popup_centered()
+		0: pass # new project
+		1: $SaveFileDialog.popup_centered()
+		2: $OpenFileDialog.popup_centered() # open .rzn file
+		3: $ImportOsuDialog.popup_centered()
 
 
 func _on_SaveFileDialog_file_selected(path):
@@ -71,3 +72,11 @@ func _on_PlayButton_pressed():
 
 func _on_VolumeSpinBox_value_changed(value):
 	$SongAudioPlayer.volume_db = linear2db(value/100.0)
+
+
+func _on_SelectAudioButton_pressed():
+	$OpenAudioDialog.popup_centered()
+
+
+func _on_OpenAudioDialog_file_selected(path):
+	$SongAudioPlayer.load_audio(path)
