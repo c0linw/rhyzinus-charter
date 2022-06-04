@@ -7,7 +7,6 @@ signal stream_changed(songaudioplayer)
 func _ready():
 	$SongAudioPlayer.load_audio("res://songs/neutralizeptbmix/audio.mp3")
 	chart_node = find_node("Chart")
-	chart_node.update_chart_length($SongAudioPlayer.get_stream_length())
 	yield(VisualServer, "frame_post_draw")
 	$Loadscreen.visible = false
 	$PanelContainer/VBoxContainer/TabContainer.set_current_tab(1)
@@ -64,15 +63,11 @@ func _on_PlayButton_pressed():
 	if $SongAudioPlayer.is_playing():
 		$SongAudioPlayer.pause()
 	else:
-		var speed_option_node = find_node("PlaySpeedOption")
-		var playback_speed = 1.0
-		if speed_option_node != null:
-			playback_speed = float(speed_option_node.text)
-		$SongAudioPlayer.play_with_parameters($SongAudioPlayer.song_position, playback_speed)
+		$SongAudioPlayer.play_from_position($SongAudioPlayer.song_position)
 
 
 func _on_VolumeSpinBox_value_changed(value):
-	$SongAudioPlayer.volume_db = linear2db(value/100.0)
+	$SongAudioPlayer.set_volume(value/100.0)
 
 
 func _on_SelectAudioButton_pressed():
@@ -81,3 +76,8 @@ func _on_SelectAudioButton_pressed():
 
 func _on_OpenAudioDialog_file_selected(path):
 	$SongAudioPlayer.load_audio(path)
+
+
+func _on_PlaySpeedOption_item_selected(index):
+	var speed_options = [0.25, 0.5, 0.75, 1.0]
+	$SongAudioPlayer.set_playback_speed(speed_options[index])
