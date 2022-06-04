@@ -5,12 +5,13 @@ signal stream_changed(songaudioplayer)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	$SongAudioPlayer.stream = load("res://songs/neutralizeptbmix/audio.mp3")
+	$SongAudioPlayer.load_audio("res://songs/neutralizeptbmix/audio.mp3")
 	chart_node = find_node("Chart")
-	chart_node.update_chart_length($SongAudioPlayer.stream.get_length())
+	chart_node.update_chart_length($SongAudioPlayer.get_stream_length())
 	yield(VisualServer, "frame_post_draw")
 	$Loadscreen.visible = false
 	$PanelContainer/VBoxContainer/TabContainer.set_current_tab(1)
+	#$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(0, true)
 	chart_node.SongAudioPlayer = $SongAudioPlayer
 
 
@@ -60,14 +61,14 @@ func _on_ImportOsuDialog_file_selected(path):
 
 
 func _on_PlayButton_pressed():
-	if $SongAudioPlayer.playing:
+	if $SongAudioPlayer.is_playing():
 		$SongAudioPlayer.pause()
 	else:
 		var speed_option_node = find_node("PlaySpeedOption")
 		var playback_speed = 1.0
 		if speed_option_node != null:
 			playback_speed = float(speed_option_node.text)
-		$SongAudioPlayer.play_with_parameters($SongAudioPlayer.song_position, playback_speed) # TODO: play based on cursor position
+		$SongAudioPlayer.play_with_parameters($SongAudioPlayer.song_position, playback_speed)
 
 
 func _on_VolumeSpinBox_value_changed(value):
