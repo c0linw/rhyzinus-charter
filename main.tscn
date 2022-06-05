@@ -614,15 +614,16 @@ margin_right = 93.0
 margin_bottom = 19.0
 text = "Audio file path"
 
-[node name="LineEdit" type="LineEdit" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/HBoxContainer"]
+[node name="AudioPathLineEdit" type="LineEdit" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/HBoxContainer"]
 margin_left = 97.0
-margin_right = 225.0
+margin_right = 353.0
 margin_bottom = 24.0
-rect_min_size = Vector2( 128, 0 )
+rect_min_size = Vector2( 256, 0 )
+editable = false
 
 [node name="SelectAudioButton" type="Button" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/HBoxContainer"]
-margin_left = 229.0
-margin_right = 307.0
+margin_left = 357.0
+margin_right = 435.0
 margin_bottom = 24.0
 text = "Select File"
 __meta__ = {

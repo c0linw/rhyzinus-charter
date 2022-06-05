@@ -23,7 +23,6 @@ var hold_pairs: Array = [] # an array of hold start/end pairs, which will be upd
 
 var ObjNote = preload("res://note.tscn")
 var ObjTimingPoint = preload("res://timing_point.tscn")
-var SongAudioPlayer: AudioStreamPlayer # root node will set this
 
 signal anchor_scroll(percentage, new_size)
 signal custom_scroll(dir_multiplier) # up is 1, down is -1
@@ -602,6 +601,7 @@ func get_chart_data() -> Dictionary:
 			"bpm": 
 				timingpoint_data["beat_length"] = timingpoint.beat_length
 				timingpoint_data["meter"] = timingpoint.meter
+				print(timingpoint.beat_length)
 			"velocity":
 				timingpoint_data["velocity"] = timingpoint.velocity
 		timing_data.append(timingpoint_data)

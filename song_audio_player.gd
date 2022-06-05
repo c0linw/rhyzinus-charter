@@ -4,6 +4,8 @@ const BUS_NAME = "Pitch"
 const BUS_INDEX = 1
 const EFF_INDEX = 0
 
+var audio_path: String = ""
+
 var custom_stream: ShinobuGodotSoundPlayback
 var pitch_shift: ShinobuGodotEffectPitchShift
 
@@ -29,6 +31,7 @@ func load_audio(path: String) -> int:
 	var err = ShinobuGodot.register_sound_from_path(path, "music")
 	if err != OK:
 		return err
+	audio_path = path
 	custom_stream = ShinobuGodot.instantiate_sound("music", "")
 	custom_stream.connect_sound_to_effect(pitch_shift)
 	custom_stream.pitch_scale = playback_speed
@@ -90,7 +93,7 @@ func set_playback_speed(speed: float):
 	pitch_shift.set_pitch_scale(1.0/speed)
 
 func _on_Chart_custom_scroll(dir_multiplier):
-	var new_position = clamp(song_position + 1.0*dir_multiplier, 0.0, get_stream_length())
+	var new_position = clamp(song_position + 0.5*dir_multiplier, 0.0, get_stream_length())
 	seek(new_position)
 	song_position = new_position
 	emit_signal("song_position_updated", song_position, get_stream_length())

@@ -12,8 +12,6 @@ func _ready():
 	
 	$PanelContainer/VBoxContainer/TabContainer.set_current_tab(1)
 	$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(0, true)
-	
-	chart_node.SongAudioPlayer = $SongAudioPlayer
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -31,7 +29,7 @@ func _on_DropdownFileMenu_item_pressed(id):
 
 func _on_SaveFileDialog_file_selected(path):
 	var file_data = chart_node.get_chart_data()
-	file_data["audio_path"] = ""
+	file_data["audio_path"] = $SongAudioPlayer.audio_path
 	
 	var file = File.new()
 	file.open(path, File.WRITE)
@@ -51,6 +49,7 @@ func _on_OpenFileDialog_file_selected(path):
 		push_error("chart data was not parsed as Dictionary")
 		return
 	chart_node.load_chart_data(result.result)
+	load_audio(result.result.audio_path)
 
 
 func _on_ImportOsuDialog_file_selected(path):
@@ -77,13 +76,21 @@ func _on_SelectAudioButton_pressed():
 
 
 func _on_OpenAudioDialog_file_selected(path):
-	var err = $SongAudioPlayer.load_audio(path)
-	var audio_status_label = find_node("AudioSelectStatusLabel")
-	audio_status_label.report_status(err)
-	if err == OK:
-		$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(0, false)
+	load_audio(path)
 
 
 func _on_PlaySpeedOption_item_selected(index):
 	var speed_options = [0.25, 0.5, 0.75, 1.0]
 	$SongAudioPlayer.set_playback_speed(speed_options[index])
+	
+func load_audio(path: String):
+	var line_edit = find_node("AudioPathLineEdit")
+	line_edit.text = path
+	var err = $SongAudioPlayer.load_audio(path)
+	if err != OK:
+		$PanelContainer/VBoxContainer/TabContainer.set_current_tab(1)
+		$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(0, true)
+	else: 
+		$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(0, false)
+	var audio_status_label = find_node("AudioSelectStatusLabel")
+	audio_status_label.report_status(err)
