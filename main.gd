@@ -5,12 +5,14 @@ signal stream_changed(songaudioplayer)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	$SongAudioPlayer.load_audio("res://songs/neutralizeptbmix/audio.mp3")
 	chart_node = find_node("Chart")
 	yield(VisualServer, "frame_post_draw")
+	
 	$Loadscreen.visible = false
+	
 	$PanelContainer/VBoxContainer/TabContainer.set_current_tab(1)
-	#$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(0, true)
+	$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(0, true)
+	
 	chart_node.SongAudioPlayer = $SongAudioPlayer
 
 
@@ -75,7 +77,11 @@ func _on_SelectAudioButton_pressed():
 
 
 func _on_OpenAudioDialog_file_selected(path):
-	$SongAudioPlayer.load_audio(path)
+	var err = $SongAudioPlayer.load_audio(path)
+	var audio_status_label = find_node("AudioSelectStatusLabel")
+	audio_status_label.report_status(err)
+	if err == OK:
+		$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(0, false)
 
 
 func _on_PlaySpeedOption_item_selected(index):

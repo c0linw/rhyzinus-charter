@@ -19,12 +19,16 @@ func _ready():
 	ShinobuGodot.initialize()
 	pitch_shift = ShinobuGodot.instantiate_pitch_shift()
 
-func load_audio(path: String):
+func load_audio(path: String) -> int:
+	# shinobu audio will literally try to load any file, so at least check the filetype (maybe try header check when i have more time)
+	if not (path.ends_with(".mp3") or path.ends_with(".wav") or path.ends_with(".ogg")):
+		return FAILED
+	
 	custom_stream = null
 	ShinobuGodot.unregister_sound("music")
 	var err = ShinobuGodot.register_sound_from_path(path, "music")
 	if err != OK:
-		push_error(err)
+		return err
 	custom_stream = ShinobuGodot.instantiate_sound("music", "")
 	custom_stream.connect_sound_to_effect(pitch_shift)
 	custom_stream.pitch_scale = playback_speed
@@ -34,6 +38,8 @@ func load_audio(path: String):
 	seek(song_position)
 	emit_signal("audio_loaded", get_stream_length())
 	emit_signal("song_position_updated", song_position, get_stream_length())
+	
+	return OK
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -67,7 +73,7 @@ func seek(to_position: float):
 		custom_stream.start()
 	
 func get_playback_position() -> float:
-	return custom_stream.get_playback_position_msec() / 1000.0
+	return (custom_stream.get_playback_position_msec() - ShinobuGodot.get_actual_buffer_size()) / 1000.0
 	
 func get_stream_length() -> float:
 	return custom_stream.get_length_msec() / 1000.0
@@ -84,7 +90,7 @@ func set_playback_speed(speed: float):
 	pitch_shift.set_pitch_scale(1.0/speed)
 
 func _on_Chart_custom_scroll(dir_multiplier):
-	var new_position = song_position + 1.0*dir_multiplier
+	var new_position = clamp(song_position + 1.0*dir_multiplier, 0.0, get_stream_length())
 	seek(new_position)
 	song_position = new_position
 	emit_signal("song_position_updated", song_position, get_stream_length())
