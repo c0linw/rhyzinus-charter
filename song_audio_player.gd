@@ -26,8 +26,7 @@ func load_audio(path: String) -> int:
 	if not (path.ends_with(".mp3") or path.ends_with(".wav") or path.ends_with(".ogg")):
 		return FAILED
 	
-	custom_stream = null
-	ShinobuGodot.unregister_sound("music")
+	unload_audio()
 	var err = ShinobuGodot.register_sound_from_path(path, "music")
 	if err != OK:
 		return err
@@ -43,6 +42,10 @@ func load_audio(path: String) -> int:
 	emit_signal("song_position_updated", song_position, get_stream_length())
 	
 	return OK
+	
+func unload_audio():
+	custom_stream = null
+	ShinobuGodot.unregister_sound("music")
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -56,18 +59,23 @@ func update_song_position():
 			emit_signal("song_position_updated", song_position, get_stream_length())
 
 func play_from_position(from_position: float):
-	seek(from_position)
-	song_position = from_position
-	custom_stream.start()
+	if custom_stream != null:
+		seek(from_position)
+		song_position = from_position
+		custom_stream.start()
 	
 func stop():
-	custom_stream.stop()
-	song_position = 0.0
+	if custom_stream != null:
+		custom_stream.stop()
+		song_position = 0.0
 
 func pause():
-	custom_stream.stop()
+	if custom_stream != null:
+		custom_stream.stop()
 
 func seek(to_position: float):
+	if custom_stream == null:
+		return
 	var previously_playing = custom_stream.is_playing()
 	var new_position_ms = to_position * 1000
 	custom_stream.seek(new_position_ms)
@@ -76,21 +84,29 @@ func seek(to_position: float):
 		custom_stream.start()
 	
 func get_playback_position() -> float:
+	if custom_stream == null:
+		return 0.0
 	return (custom_stream.get_playback_position_msec() - ShinobuGodot.get_actual_buffer_size()) / 1000.0
 	
 func get_stream_length() -> float:
+	if custom_stream == null:
+		return 0.0
 	return custom_stream.get_length_msec() / 1000.0
 	
 func is_playing() -> bool:
+	if custom_stream == null:
+		return false
 	return custom_stream.is_playing()
 	
 func set_volume(linear_volume: float):
-	custom_stream.set_volume(linear_volume)
+	if custom_stream != null:
+		custom_stream.set_volume(linear_volume)
 	
 func set_playback_speed(speed: float):
-	playback_speed = speed
-	custom_stream.set_pitch_scale(speed)
 	pitch_shift.set_pitch_scale(1.0/speed)
+	playback_speed = speed
+	if custom_stream != null:
+		custom_stream.set_pitch_scale(speed)
 
 func _on_Chart_custom_scroll(dir_multiplier):
 	var new_position = clamp(song_position + 0.5*dir_multiplier, 0.0, get_stream_length())

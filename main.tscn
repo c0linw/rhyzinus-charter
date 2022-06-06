@@ -165,9 +165,6 @@ script = ExtResource( 4 )
 [node name="PanelContainer" type="PanelContainer" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
 margin_left = 7.0
@@ -181,11 +178,11 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
+[node name="Toolbar" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
 margin_right = 1010.0
 margin_bottom = 20.0
 
-[node name="DropdownFileMenu" type="MenuButton" parent="PanelContainer/VBoxContainer/HBoxContainer2"]
+[node name="DropdownFileMenu" type="MenuButton" parent="PanelContainer/VBoxContainer/Toolbar"]
 margin_right = 35.0
 margin_bottom = 20.0
 text = "File"
@@ -201,7 +198,7 @@ custom_constants/separation = 8
 [node name="TabContainer" type="TabContainer" parent="PanelContainer/VBoxContainer"]
 margin_top = 28.0
 margin_right = 1010.0
-margin_bottom = 586.0
+margin_bottom = 564.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 tab_align = 0
@@ -310,20 +307,20 @@ suffix = "%"
 [node name="EditorHBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer/TabContainer/Edit"]
 margin_top = 52.0
 margin_right = 1002.0
-margin_bottom = 486.0
+margin_bottom = 464.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 custom_constants/separation = 0
 
 [node name="LayerSelectTabs" type="HBoxContainer" parent="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer"]
 margin_right = 200.0
-margin_bottom = 434.0
+margin_bottom = 412.0
 rect_min_size = Vector2( 200, 0 )
 script = ExtResource( 5 )
 
 [node name="TabContainer" type="TabContainer" parent="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/LayerSelectTabs"]
 margin_right = 141.0
-margin_bottom = 434.0
+margin_bottom = 412.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 tab_align = 0
@@ -407,7 +404,7 @@ type = "velocity"
 [node name="VerticalTabs" type="VBoxContainer" parent="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/LayerSelectTabs"]
 margin_left = 145.0
 margin_right = 200.0
-margin_bottom = 434.0
+margin_bottom = 412.0
 
 [node name="Lower" type="Button" parent="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/LayerSelectTabs/VerticalTabs"]
 margin_right = 55.0
@@ -443,7 +440,7 @@ tab_index = 2
 [node name="PanelContainer" type="PanelContainer" parent="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer"]
 margin_left = 200.0
 margin_right = 746.0
-margin_bottom = 434.0
+margin_bottom = 412.0
 mouse_filter = 1
 size_flags_vertical = 3
 
@@ -451,12 +448,12 @@ size_flags_vertical = 3
 margin_left = 7.0
 margin_top = 7.0
 margin_right = 539.0
-margin_bottom = 427.0
+margin_bottom = 405.0
 custom_constants/separation = 0
 
 [node name="ChartView" type="ScrollContainer" parent="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer"]
 margin_right = 532.0
-margin_bottom = 416.0
+margin_bottom = 394.0
 rect_min_size = Vector2( 532, 0 )
 mouse_filter = 2
 size_flags_horizontal = 0
@@ -470,7 +467,7 @@ script = ExtResource( 2 )
 margin_left = 1.0
 margin_top = 1.0
 margin_right = 531.0
-margin_bottom = 415.0
+margin_bottom = 393.0
 grow_vertical = 0
 rect_min_size = Vector2( 480, 0 )
 size_flags_horizontal = 3
@@ -502,9 +499,9 @@ __meta__ = {
 }
 
 [node name="Playhead" type="ColorRect" parent="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer"]
-margin_top = 416.0
+margin_top = 394.0
 margin_right = 532.0
-margin_bottom = 420.0
+margin_bottom = 398.0
 rect_min_size = Vector2( 0, 4 )
 size_flags_horizontal = 3
 color = Color( 1, 0, 0, 1 )
@@ -513,9 +510,9 @@ __meta__ = {
 }
 
 [node name="MarginContainer" type="MarginContainer" parent="PanelContainer/VBoxContainer/TabContainer/Edit"]
-margin_top = 490.0
+margin_top = 468.0
 margin_right = 1002.0
-margin_bottom = 522.0
+margin_bottom = 500.0
 custom_constants/margin_right = 32
 custom_constants/margin_top = 8
 custom_constants/margin_left = 0
@@ -595,7 +592,7 @@ custom_constants/margin_bottom = 8
 margin_left = 8.0
 margin_top = 8.0
 margin_right = 994.0
-margin_bottom = 514.0
+margin_bottom = 492.0
 
 [node name="AudioSetupLabel" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer"]
 margin_right = 986.0
@@ -693,6 +690,25 @@ margin_left = 42.0
 margin_top = 56.0
 margin_right = 100.0
 margin_bottom = 80.0
+
+[node name="StatusBar" type="MarginContainer" parent="PanelContainer/VBoxContainer"]
+margin_top = 564.0
+margin_right = 1010.0
+margin_bottom = 586.0
+custom_constants/margin_top = 8
+
+[node name="StatusLabel" type="Label" parent="PanelContainer/VBoxContainer/StatusBar"]
+margin_top = 8.0
+margin_right = 1010.0
+margin_bottom = 22.0
+text = "Ready"
+
+[node name="VersionLabel" type="Label" parent="PanelContainer/VBoxContainer/StatusBar"]
+margin_top = 8.0
+margin_right = 1010.0
+margin_bottom = 22.0
+text = "Pre-release"
+align = 2
 
 [node name="SongAudioPlayer" type="AudioStreamPlayer" parent="."]
 script = ExtResource( 3 )
@@ -800,7 +816,8 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[connection signal="item_pressed" from="PanelContainer/VBoxContainer/HBoxContainer2/DropdownFileMenu" to="." method="_on_DropdownFileMenu_item_pressed"]
+[connection signal="item_pressed" from="PanelContainer/VBoxContainer/Toolbar/DropdownFileMenu" to="." method="_on_DropdownFileMenu_item_pressed"]
+[connection signal="tab_changed" from="PanelContainer/VBoxContainer/TabContainer" to="." method="_on_TabContainer_tab_changed"]
 [connection signal="item_selected" from="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer/SubdivisionOption" to="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer/SubdivisionOption" method="_on_SubdivisionOption_item_selected"]
 [connection signal="subdivision_changed" from="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer/SubdivisionOption" to="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer/ChartView/Chart" method="_on_SubdivisionOption_subdivision_changed"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer/ZoomMinus" to="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer/ChartView/Chart" method="_on_ZoomMinus_pressed"]

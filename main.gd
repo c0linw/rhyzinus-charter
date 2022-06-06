@@ -21,7 +21,7 @@ func _ready():
 
 func _on_DropdownFileMenu_item_pressed(id):
 	match id:
-		0: pass # new project
+		0: new_project()
 		1: $SaveFileDialog.popup_centered()
 		2: $OpenFileDialog.popup_centered() # open .rzn file
 		3: $ImportOsuDialog.popup_centered()
@@ -94,3 +94,24 @@ func load_audio(path: String):
 		$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(0, false)
 	var audio_status_label = find_node("AudioSelectStatusLabel")
 	audio_status_label.report_status(err)
+	
+func new_project():
+	# TODO: prompt if want to save?
+	$SongAudioPlayer.unload_audio()
+	$PanelContainer/VBoxContainer/TabContainer.set_current_tab(1)
+	$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(0, true)
+	chart_node.reset_chart_data()
+	
+	var line_edit = find_node("AudioPathLineEdit")
+	line_edit.text = ""
+	var audio_status_label = find_node("AudioSelectStatusLabel")
+	audio_status_label.reset_status()
+
+func _notification(what):
+	if what == MainLoop.NOTIFICATION_WM_QUIT_REQUEST:
+		get_tree().quit() # default behavior. TODO: prompt user for save
+
+
+func _on_TabContainer_tab_changed(tab):
+	if tab != 0:
+		$SongAudioPlayer.pause()

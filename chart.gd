@@ -296,7 +296,6 @@ func add_note(note_data: Dictionary):
 	var duplicate_note = find_note(note_instance.time, note_instance.lane)
 	if duplicate_note != null:
 		delete_note(duplicate_note)
-	print("adding note with time %s, lane %s, type %s" % [note_instance.time, note_instance.lane, note_instance.type])
 	notes.append(note_instance)
 	if note_instance.lane >= 0 and note_instance.lane <= 7:
 		$Lower.add_child(note_instance)
@@ -334,7 +333,7 @@ func find_note(time: float, lane: int):
 	
 	
 func add_timingpoint(timingpoint_data: Dictionary):
-	var latest_timingpoint_time = notes[len(timing_points)-1].time if len(timing_points) > 0 else 0
+	var latest_timingpoint_time = timing_points[len(timing_points)-1].time if len(timing_points) > 0 else 0
 	var timingpoint_instance: TimingPoint = ObjTimingPoint.instance()
 	timingpoint_instance.set_data(timingpoint_data)
 	var duplicate_point = find_timingpoint(timingpoint_instance.time, timingpoint_instance.type)
@@ -627,6 +626,21 @@ func load_chart_data(chart_data: Dictionary):
 	for timingpoint_data in chart_data.timing_points:
 		add_timingpoint(timingpoint_data)
 
+func reset_chart_data():
+	for note in notes:
+		note.queue_free()
+	for timingpoint in timing_points:
+		timingpoint.queue_free()
+	notes = []
+	timing_points = []
+	hold_pairs = []
+	
+	add_timingpoint({
+		"time": 0,
+		"beat_length": 0.5,
+		"meter": 4,
+		"type": "bpm"
+	})
 
 func _on_SongAudioPlayer_audio_loaded(new_length):
 	update_chart_length(new_length)

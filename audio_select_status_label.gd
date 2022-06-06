@@ -2,7 +2,7 @@ extends Label
 
 
 # Declare member variables here. Examples:
-# var a = 2
+const DEFAULT_MSG = "Please select an audio file to access the \"Edit\" tab."
 # var b = "text"
 
 
@@ -22,3 +22,7 @@ func report_status(err: int):
 	else:
 		add_color_override("font_color", Color(0.5, 1.0, 0.5))
 		text = "Audio successfully loaded from file! You can now edit the chart in the Edit tab."
+
+func reset_status():
+	add_color_override("font_color", Color(1.0, 1.0, 1.0))
+	text = DEFAULT_MSG
