@@ -1,12 +1,17 @@
 extends Control
 
 var chart_node: Chart
+signal stream_changed(songaudioplayer)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	$SongAudioPlayer.stream = load("res://songs/neutralizeptbmix/audio.mp3")
 	chart_node = find_node("Chart")
-	chart_node.update_chart_length($SongAudioPlayer.stream.get_length())
+	yield(VisualServer, "frame_post_draw")
+	
+	$Loadscreen.visible = false
+	
+	$PanelContainer/VBoxContainer/TabContainer.set_current_tab(1)
+	$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(0, true)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -16,14 +21,15 @@ func _ready():
 
 func _on_DropdownFileMenu_item_pressed(id):
 	match id:
-		0: $SaveFileDialog.popup_centered()
-		1: $OpenFileDialog.popup_centered() # open .rzn file
-		2: $ImportOsuDialog.popup_centered()
+		0: new_project()
+		1: $SaveFileDialog.popup_centered()
+		2: $OpenFileDialog.popup_centered() # open .rzn file
+		3: $ImportOsuDialog.popup_centered()
 
 
 func _on_SaveFileDialog_file_selected(path):
 	var file_data = chart_node.get_chart_data()
-	file_data["audio_path"] = ""
+	file_data["audio_path"] = $SongAudioPlayer.audio_path
 	
 	var file = File.new()
 	file.open(path, File.WRITE)
@@ -43,6 +49,7 @@ func _on_OpenFileDialog_file_selected(path):
 		push_error("chart data was not parsed as Dictionary")
 		return
 	chart_node.load_chart_data(result.result)
+	load_audio(result.result.audio_path)
 
 
 func _on_ImportOsuDialog_file_selected(path):
@@ -51,3 +58,60 @@ func _on_ImportOsuDialog_file_selected(path):
 		push_error(".osu chart loading failed")
 		return
 	chart_node.load_chart_data(result)
+
+
+func _on_PlayButton_pressed():
+	if $SongAudioPlayer.is_playing():
+		$SongAudioPlayer.pause()
+	else:
+		$SongAudioPlayer.play_from_position($SongAudioPlayer.song_position)
+
+
+func _on_VolumeSpinBox_value_changed(value):
+	$SongAudioPlayer.set_volume(value/100.0)
+
+
+func _on_SelectAudioButton_pressed():
+	$OpenAudioDialog.popup_centered()
+
+
+func _on_OpenAudioDialog_file_selected(path):
+	load_audio(path)
+
+
+func _on_PlaySpeedOption_item_selected(index):
+	var speed_options = [0.25, 0.5, 0.75, 1.0]
+	$SongAudioPlayer.set_playback_speed(speed_options[index])
+	
+func load_audio(path: String):
+	var line_edit = find_node("AudioPathLineEdit")
+	line_edit.text = path
+	var err = $SongAudioPlayer.load_audio(path)
+	if err != OK:
+		$PanelContainer/VBoxContainer/TabContainer.set_current_tab(1)
+		$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(0, true)
+	else: 
+		$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(0, false)
+	var audio_status_label = find_node("AudioSelectStatusLabel")
+	audio_status_label.report_status(err)
+	
+func new_project():
+	# TODO: prompt if want to save?
+	$SongAudioPlayer.unload_audio()
+	$PanelContainer/VBoxContainer/TabContainer.set_current_tab(1)
+	$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(0, true)
+	chart_node.reset_chart_data()
+	
+	var line_edit = find_node("AudioPathLineEdit")
+	line_edit.text = ""
+	var audio_status_label = find_node("AudioSelectStatusLabel")
+	audio_status_label.reset_status()
+
+func _notification(what):
+	if what == MainLoop.NOTIFICATION_WM_QUIT_REQUEST:
+		get_tree().quit() # default behavior. TODO: prompt user for save
+
+
+func _on_TabContainer_tab_changed(tab):
+	if tab != 0:
+		$SongAudioPlayer.pause()

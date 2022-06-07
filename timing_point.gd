@@ -28,7 +28,7 @@ func set_data(timingpoint_data: Dictionary):
 			meter = timingpoint_data.meter
 			color = bpm_color
 			$RichTextLabel.add_color_override("default_color", bpm_color)
-			$RichTextLabel.bbcode_text = "%s BPM %s/4" % [60.0/beat_length, meter]
+			$RichTextLabel.bbcode_text = "%s BPM %s/4" % [stepify(60.0/beat_length, 0.001), meter]
 		"velocity":
 			velocity = timingpoint_data.velocity
 			color = velocity_color

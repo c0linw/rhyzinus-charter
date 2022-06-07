@@ -25,6 +25,7 @@ var ObjNote = preload("res://note.tscn")
 var ObjTimingPoint = preload("res://timing_point.tscn")
 
 signal anchor_scroll(percentage, new_size)
+signal custom_scroll(dir_multiplier) # up is 1, down is -1
 
 enum BeatType {MEASURE, BEAT, SUBDIVISION}
 
@@ -54,22 +55,6 @@ class TimeSorter:
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	for i in range(0, 8):
-		var note_data: Dictionary = {
-			"time": i*0.5,
-			"lane": i,
-			"type": "tap"
-		}
-		add_note(note_data)
-		
-	for i in range(10,14):
-		var note_data: Dictionary = {
-			"time": i-10,
-			"lane": i,
-			"type": "tap"
-		}
-		add_note(note_data)
-		
 	add_timingpoint({
 		"time": 0,
 		"beat_length": 0.5,
@@ -87,7 +72,7 @@ func _ready():
 	update_timingpoint_positions()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
+# func _process(delta):
 #	pass
 
 func _draw():
@@ -281,6 +266,10 @@ func _on_Chart_gui_input(event):
 				add_note(new_note_data)
 		if event.button_index == BUTTON_RIGHT and event.pressed:
 			pass
+		if event.button_index == BUTTON_WHEEL_DOWN and event.pressed:
+			emit_signal("custom_scroll", -1)
+		if event.button_index == BUTTON_WHEEL_UP and event.pressed:
+			emit_signal("custom_scroll", 1)
 			
 func _on_Note_gui_input(event, note):
 	if event is InputEventMouseButton:
@@ -307,7 +296,6 @@ func add_note(note_data: Dictionary):
 	var duplicate_note = find_note(note_instance.time, note_instance.lane)
 	if duplicate_note != null:
 		delete_note(duplicate_note)
-	print("adding note with time %s, lane %s, type %s" % [note_instance.time, note_instance.lane, note_instance.type])
 	notes.append(note_instance)
 	if note_instance.lane >= 0 and note_instance.lane <= 7:
 		$Lower.add_child(note_instance)
@@ -345,7 +333,7 @@ func find_note(time: float, lane: int):
 	
 	
 func add_timingpoint(timingpoint_data: Dictionary):
-	var latest_timingpoint_time = notes[len(timing_points)-1].time if len(timing_points) > 0 else 0
+	var latest_timingpoint_time = timing_points[len(timing_points)-1].time if len(timing_points) > 0 else 0
 	var timingpoint_instance: TimingPoint = ObjTimingPoint.instance()
 	timingpoint_instance.set_data(timingpoint_data)
 	var duplicate_point = find_timingpoint(timingpoint_instance.time, timingpoint_instance.type)
@@ -428,6 +416,12 @@ func update_timingpoint_positions():
 		elif timingpoint.type == "velocity":
 			timingpoint.set_position(Vector2(rect_size.x/2 - 4, y))
 		timingpoint.rect_size.x = rect_size.x/2 - 4
+		
+func chart_position_to_time(y: float) -> float:
+	 return (rect_min_size.y - y) / pixels_per_second
+	
+func time_to_chart_position(time: float) -> float:
+	return rect_min_size.y - time*pixels_per_second
 
 func find_closest_beat(position_on_chart: Vector2):
 	# modified binary search
@@ -606,6 +600,7 @@ func get_chart_data() -> Dictionary:
 			"bpm": 
 				timingpoint_data["beat_length"] = timingpoint.beat_length
 				timingpoint_data["meter"] = timingpoint.meter
+				print(timingpoint.beat_length)
 			"velocity":
 				timingpoint_data["velocity"] = timingpoint.velocity
 		timing_data.append(timingpoint_data)
@@ -630,3 +625,22 @@ func load_chart_data(chart_data: Dictionary):
 		add_note(note_data)
 	for timingpoint_data in chart_data.timing_points:
 		add_timingpoint(timingpoint_data)
+
+func reset_chart_data():
+	for note in notes:
+		note.queue_free()
+	for timingpoint in timing_points:
+		timingpoint.queue_free()
+	notes = []
+	timing_points = []
+	hold_pairs = []
+	
+	add_timingpoint({
+		"time": 0,
+		"beat_length": 0.5,
+		"meter": 4,
+		"type": "bpm"
+	})
+
+func _on_SongAudioPlayer_audio_loaded(new_length):
+	update_chart_length(new_length)
