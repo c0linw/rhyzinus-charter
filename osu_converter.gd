@@ -14,9 +14,11 @@ func _ready():
 # loads the chart file and processes every line until the end. 
 # Returns null if failed, otherwise dict containing the processed notes/timing info
 func load_chart(file_path: String):
+	current_section = ""
 	chart_data = {
 		"notes": [],
-		"timing_points": []
+		"bpm_changes": [],
+		"velocity_changes": []
 	}
 	# get data from file
 	var file := File.new()
@@ -60,20 +62,20 @@ func process_chart_line(line: String, receiver: Dictionary) -> bool:
 				"meter": int(timing_data[2]), # ignored if type == 1
 				"type": timing_type
 			}
-			receiver.timing_points.append(timing_point)
+			receiver.bpm_changes.append(timing_point)
 		else:
 			var timing_point: Dictionary = {
 				"time": get_time(timing_data[0]),
 				"velocity": -100.0/float(timing_data[1]),
 				"type": timing_type
 			}
-			receiver.timing_points.append(timing_point)
+			receiver.velocity_changes.append(timing_point)
 		return true
 		
 	if current_section == "[HitObjects]":
 		var note_data: Array = line.split(",")
 		if len(note_data) != 6:
-			print("hitobject has %s values, was expecting 6" % len(note_data))
+			print("hitobject has %s values, was expecting 6, data = %s" % [len(note_data), line])
 			return false
 		var note_type: String = get_note_type(note_data)
 		if note_type == "tap": # tap note

@@ -7,8 +7,9 @@ const MIN_ZOOM = 64
 
 enum {LAYER_LOWER, LAYER_UPPER, LAYER_TIMING}
 
-var notes: Array = [] # Array of lower or side note entities
-var timing_points: Array = [] # Array of timing point entities 
+var notes: Array = [] # Array of ObjNote entities
+var bpm_changes: Array = [] # Array of ObjTimingPoint instances, bpm changes only
+var velocity_changes: Array = [] # Array of ObjTimingPoint instances, velocity changes only
 var beats: Array = []
 var pixels_per_second = 192 # determines "vertical" scale of chart display
 var note_height = 16
@@ -63,7 +64,8 @@ func _ready():
 	})
 		
 	notes.sort_custom(TimeSorter, "sort_notes_ascending")
-	timing_points.sort_custom(TimeSorter, "sort_ascending")
+	bpm_changes.sort_custom(TimeSorter, "sort_ascending")
+	velocity_changes.sort_custom(TimeSorter, "sort_ascending")
 	
 	beats = generate_beats(current_subdivision)
 	
@@ -129,7 +131,7 @@ func _draw():
 			draw_rect(hold_rect, Color(0.13,0.25,1, 0.4))
 			
 func generate_beats(subdivision: int):
-	var data: Array = timing_points.duplicate()
+	var data: Array = bpm_changes.duplicate()
 	data.sort_custom(TimeSorter, "sort_timingpoints_ascending")
 	var beat_output: Array = []
 	var timestamp: float = data[0].time
@@ -303,8 +305,7 @@ func add_note(note_data: Dictionary):
 		$Upper.add_child(note_instance)
 	note_instance.connect("custom_gui_input", self, "_on_Note_gui_input")
 	
-	if note_instance.time <= latest_note_time or duplicate_note != null:
-		notes.sort_custom(TimeSorter, "sort_notes_ascending")
+	notes.sort_custom(TimeSorter, "sort_notes_ascending")
 		
 	hold_pairs = find_hold_pairs(notes)
 	update_note_positions()
@@ -333,24 +334,33 @@ func find_note(time: float, lane: int):
 	
 	
 func add_timingpoint(timingpoint_data: Dictionary):
-	var latest_timingpoint_time = timing_points[len(timing_points)-1].time if len(timing_points) > 0 else 0
-	var timingpoint_instance: TimingPoint = ObjTimingPoint.instance()
-	timingpoint_instance.set_data(timingpoint_data)
-	var duplicate_point = find_timingpoint(timingpoint_instance.time, timingpoint_instance.type)
-	if duplicate_point != null:
-		print("timing point already exists, opening edit window instead")
-		if duplicate_point.type == "bpm":
-			var dialog = get_tree().get_nodes_in_group("bpm_timingpoint_dialog")[0]
-			dialog.setup(duplicate_point)
-			dialog.popup()
-		return
-	print("adding timing with time %s, type %s" % [timingpoint_instance.time, timingpoint_instance.type])
-	timing_points.append(timingpoint_instance)
-	$Timing.add_child(timingpoint_instance)
-	timingpoint_instance.connect("custom_gui_input", self, "_on_TimingPoint_gui_input")
-	
-	if timingpoint_instance.time <= latest_timingpoint_time or duplicate_point != null:
-		timing_points.sort_custom(TimeSorter, "sort_ascending")
+	match timingpoint_data.type:
+		"bpm":
+			var timingpoint_instance: TimingPoint = ObjTimingPoint.instance()
+			timingpoint_instance.set_data(timingpoint_data)
+			var duplicate_point = find_timingpoint(timingpoint_instance.time, timingpoint_instance.type)
+			if duplicate_point != null:
+				print("timing point already exists, opening edit window instead")
+				var dialog = get_tree().get_nodes_in_group("bpm_timingpoint_dialog")[0]
+				dialog.setup(duplicate_point)
+				dialog.popup()
+				return
+			bpm_changes.append(timingpoint_instance)
+			$Timing.add_child(timingpoint_instance)
+			timingpoint_instance.connect("custom_gui_input", self, "_on_TimingPoint_gui_input")
+			bpm_changes.sort_custom(TimeSorter, "sort_ascending")
+		"velocity":
+			var timingpoint_instance: TimingPoint = ObjTimingPoint.instance()
+			timingpoint_instance.set_data(timingpoint_data)
+			var duplicate_point = find_timingpoint(timingpoint_instance.time, timingpoint_instance.type)
+			if duplicate_point != null:
+				velocity_changes.erase(duplicate_point)
+			velocity_changes.append(timingpoint_instance)
+			$Timing.add_child(timingpoint_instance)
+			timingpoint_instance.connect("custom_gui_input", self, "_on_TimingPoint_gui_input")
+			velocity_changes.sort_custom(TimeSorter, "sort_ascending")
+		_:
+			return
 		
 	beats = generate_beats(current_subdivision)
 	update_timingpoint_positions()
@@ -359,8 +369,18 @@ func add_timingpoint(timingpoint_data: Dictionary):
 	
 	
 func delete_timingpoint(timingpoint):
+	match timingpoint.type:
+		"bpm":
+			if len(bpm_changes) == 1:
+				print("cannot delete timing point, at least one is required")
+				return
+			bpm_changes.erase(timingpoint)
+		"velocity":
+			velocity_changes.erase(timingpoint)
+		_:
+			return
+			
 	print("deleting timing point with time %s, type %s" % [timingpoint.time, timingpoint.type])
-	timing_points.erase(timingpoint)
 	timingpoint.queue_free()
 	beats = generate_beats(current_subdivision)
 	update_timingpoint_positions()
@@ -370,11 +390,20 @@ func delete_timingpoint(timingpoint):
 	
 # returns a note entity, or null
 func find_timingpoint(time: float, type: String):
+	var points: Array
+	match type:
+		"bpm":
+			points = bpm_changes
+		"velocity":
+			points = velocity_changes
+		_:
+			return
+	
 	# not sure how well binary search will deal with error margins and two sort parameters (time and lane), so just linear search for now
 	
 	# use an error margin in case of float rounding problems 
 	var error_margin: float = 0.002
-	for point in timing_points:
+	for point in points:
 		if point.type == type and abs(point.time - time) <= error_margin:
 			return point
 		elif point.time > time + error_margin:
@@ -409,12 +438,14 @@ func update_note_positions():
 			note.set_position(Vector2(x,y))
 			
 func update_timingpoint_positions():
-	for timingpoint in timing_points:
+	for timingpoint in bpm_changes:
 		var y = rect_min_size.y - timingpoint.time*pixels_per_second - timingpoint.rect_size.y/2
-		if timingpoint.type == "bpm":
-			timingpoint.set_position(Vector2(0, y))
-		elif timingpoint.type == "velocity":
-			timingpoint.set_position(Vector2(rect_size.x/2 - 4, y))
+		timingpoint.set_position(Vector2(0, y))
+		timingpoint.rect_size.x = rect_size.x/2 - 4
+	
+	for timingpoint in velocity_changes:
+		var y = rect_min_size.y - timingpoint.time*pixels_per_second - timingpoint.rect_size.y/2
+		timingpoint.set_position(Vector2(rect_size.x/2 - 4, y))
 		timingpoint.rect_size.x = rect_size.x/2 - 4
 		
 func chart_position_to_time(y: float) -> float:
@@ -557,10 +588,8 @@ func _on_notetype_selected(type: String):
 
 
 func _on_BPMTimingPointDialog_set_bpm_point(instance, offset, bpm, meter):
-	for timing_point in timing_points:
-		if timing_point == instance:
-			var latest_timingpoint_time = notes[len(timing_points)-1].time if len(timing_points) > 0 else 0
-			
+	for timing_point in bpm_changes:
+		if timing_point == instance:		
 			var new_data: Dictionary = {
 				"time": offset,
 				"beat_length": 60.0/bpm,
@@ -569,8 +598,7 @@ func _on_BPMTimingPointDialog_set_bpm_point(instance, offset, bpm, meter):
 			}
 			timing_point.set_data(new_data)
 			
-			if timing_point.time <= latest_timingpoint_time:
-				timing_points.sort_custom(TimeSorter, "sort_ascending")
+			bpm_changes.sort_custom(TimeSorter, "sort_ascending")
 				
 			beats = generate_beats(current_subdivision)
 			update_timingpoint_positions()
@@ -590,24 +618,29 @@ func get_chart_data() -> Dictionary:
 			"lane": note.lane,
 		})
 	
-	var timing_data: Array = []
-	for timingpoint in timing_points:
-		var timingpoint_data = {
+	var bpm_data: Array = []
+	for timingpoint in bpm_changes:
+		var bpm_change = {
 			"time": timingpoint.time,
 			"type": timingpoint.type,
+			"beat_length": timingpoint.beat_length,
+			"meter": timingpoint.meter
 		}
-		match timingpoint.type:
-			"bpm": 
-				timingpoint_data["beat_length"] = timingpoint.beat_length
-				timingpoint_data["meter"] = timingpoint.meter
-				print(timingpoint.beat_length)
-			"velocity":
-				timingpoint_data["velocity"] = timingpoint.velocity
-		timing_data.append(timingpoint_data)
+		bpm_data.append(bpm_change)
+
+	var velocity_data: Array = []
+	for timingpoint in velocity_changes:
+		var velocity_change = {
+			"time": timingpoint.time,
+			"type": timingpoint.type,
+			"velocity": timingpoint.velocity
+		}
+		velocity_data.append(velocity_change)
 	
 	var chart_data: Dictionary = {
 		"notes": note_data,
-		"timing_points": timing_data
+		"bpm_changes": bpm_data,
+		"velocity_changes": velocity_data
 	}
 	return chart_data
 	
@@ -615,24 +648,32 @@ func get_chart_data() -> Dictionary:
 func load_chart_data(chart_data: Dictionary):
 	for note in notes:
 		note.queue_free()
-	for timingpoint in timing_points:
+	for timingpoint in bpm_changes:
+		timingpoint.queue_free()
+	for timingpoint in velocity_changes:
 		timingpoint.queue_free()
 	notes = []
-	timing_points = []
+	bpm_changes = []
+	velocity_changes = []
 	
 	# TODO: optimize by not calling add_note and add_timingpoint repeatedly
 	for note_data in chart_data.notes:
 		add_note(note_data)
-	for timingpoint_data in chart_data.timing_points:
+	for timingpoint_data in chart_data.bpm_changes:
+		add_timingpoint(timingpoint_data)
+	for timingpoint_data in chart_data.velocity_changes:
 		add_timingpoint(timingpoint_data)
 
 func reset_chart_data():
 	for note in notes:
 		note.queue_free()
-	for timingpoint in timing_points:
+	for timingpoint in bpm_changes:
+		timingpoint.queue_free()
+	for timingpoint in velocity_changes:
 		timingpoint.queue_free()
 	notes = []
-	timing_points = []
+	bpm_changes = []
+	velocity_changes = []
 	hold_pairs = []
 	
 	add_timingpoint({
