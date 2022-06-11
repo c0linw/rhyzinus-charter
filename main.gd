@@ -48,8 +48,8 @@ func _on_OpenFileDialog_file_selected(path):
 	if typeof(result.result) != TYPE_DICTIONARY:
 		push_error("chart data was not parsed as Dictionary")
 		return
-	chart_node.load_chart_data(result.result)
 	load_audio(result.result.audio_path)
+	chart_node.load_chart_data(result.result)
 
 
 func _on_ImportOsuDialog_file_selected(path):
@@ -86,12 +86,24 @@ func _on_PlaySpeedOption_item_selected(index):
 func load_audio(path: String):
 	var line_edit = find_node("AudioPathLineEdit")
 	line_edit.text = path
+	
+	# quietly switch to "edit" tab while loading so that the chart size is properly updated, then switch back
+	$Loadscreen.visible = true
+	var tab_idx = $PanelContainer/VBoxContainer/TabContainer.current_tab
+	$PanelContainer/VBoxContainer/TabContainer.set_current_tab(0)
+
 	var err = $SongAudioPlayer.load_audio(path)
+	yield(VisualServer, "frame_post_draw")
+	
 	if err != OK:
 		$PanelContainer/VBoxContainer/TabContainer.set_current_tab(1)
 		$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(0, true)
 	else: 
+		$SongAudioPlayer.emit_signal("song_position_updated", $SongAudioPlayer.song_position, $SongAudioPlayer.get_stream_length())
+		$PanelContainer/VBoxContainer/TabContainer.set_current_tab(tab_idx)
 		$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(0, false)
+	
+	$Loadscreen.visible = false
 	var audio_status_label = find_node("AudioSelectStatusLabel")
 	audio_status_label.report_status(err)
 	
