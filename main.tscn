@@ -640,57 +640,6 @@ margin_right = 986.0
 margin_bottom = 90.0
 custom_constants/separation = 16
 
-[node name="TimingSetupLabel" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer"]
-margin_top = 94.0
-margin_right = 986.0
-margin_bottom = 118.0
-custom_fonts/font = ExtResource( 13 )
-text = "Initial Timing Point Setup"
-
-[node name="GridContainer" type="GridContainer" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer"]
-margin_top = 122.0
-margin_right = 986.0
-margin_bottom = 202.0
-columns = 2
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Label" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/GridContainer"]
-margin_top = 5.0
-margin_right = 38.0
-margin_bottom = 19.0
-text = "Time"
-
-[node name="LineEdit" type="LineEdit" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/GridContainer"]
-margin_left = 42.0
-margin_right = 100.0
-margin_bottom = 24.0
-
-[node name="Label2" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/GridContainer"]
-margin_top = 33.0
-margin_right = 38.0
-margin_bottom = 47.0
-text = "BPM"
-
-[node name="LineEdit2" type="LineEdit" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/GridContainer"]
-margin_left = 42.0
-margin_top = 28.0
-margin_right = 100.0
-margin_bottom = 52.0
-
-[node name="Label3" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/GridContainer"]
-margin_top = 61.0
-margin_right = 38.0
-margin_bottom = 75.0
-text = "Meter"
-
-[node name="LineEdit3" type="LineEdit" parent="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/GridContainer"]
-margin_left = 42.0
-margin_top = 56.0
-margin_right = 100.0
-margin_bottom = 80.0
-
 [node name="StatusBar" type="MarginContainer" parent="PanelContainer/VBoxContainer"]
 margin_top = 564.0
 margin_right = 1010.0
