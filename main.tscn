@@ -186,7 +186,7 @@ margin_bottom = 20.0
 margin_right = 35.0
 margin_bottom = 20.0
 text = "File"
-items = [ "New", null, 0, false, false, 0, 0, null, "", false, "Save", null, 0, false, false, 1, 0, null, "", false, "Open", null, 0, false, false, 2, 0, null, "", false, "Import .osu file", null, 0, false, false, 3, 0, null, "", false ]
+items = [ "New (Ctrl+N)", null, 0, false, false, 0, 0, null, "", false, "Save (Ctrl+S)", null, 0, false, false, 1, 0, null, "", false, "Save As (Ctrl+Shift+S)", null, 0, false, false, 2, 0, null, "", false, "Open (Ctrl+O)", null, 0, false, false, 3, 0, null, "", false, "Import .osu file (Ctrl+I)", null, 0, false, false, 4, 0, null, "", false ]
 script = ExtResource( 12 )
 
 [node name="HSeparator" type="HSeparator" parent="PanelContainer/VBoxContainer"]
@@ -662,7 +662,7 @@ align = 2
 [node name="SongAudioPlayer" type="AudioStreamPlayer" parent="."]
 script = ExtResource( 3 )
 
-[node name="OpenAudioDialog" type="FileDialog" parent="."]
+[node name="OpenAudioDialog" type="FileDialog" parent="." groups=["popups"]]
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -684,7 +684,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="BPMTimingPointDialog" parent="." instance=ExtResource( 11 )]
+[node name="BPMTimingPointDialog" parent="." groups=["popups"] instance=ExtResource( 11 )]
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -694,7 +694,7 @@ margin_top = -75.5
 margin_right = 94.5
 margin_bottom = 75.5
 
-[node name="ImportOsuDialog" type="FileDialog" parent="."]
+[node name="ImportOsuDialog" type="FileDialog" parent="." groups=["popups"]]
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -716,7 +716,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="OpenFileDialog" type="FileDialog" parent="."]
+[node name="OpenFileDialog" type="FileDialog" parent="." groups=["popups"]]
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -738,7 +738,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="SaveFileDialog" type="FileDialog" parent="."]
+[node name="SaveFileDialog" type="FileDialog" parent="." groups=["popups"]]
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
