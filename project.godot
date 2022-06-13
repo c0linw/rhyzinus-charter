@@ -36,6 +36,10 @@ config/name="Rhyzinus-charter"
 run/main_scene="res://main.tscn"
 config/icon="res://icon.png"
 
+[autoload]
+
+EditorStatus="*res://editor_status.gd"
+
 [input_devices]
 
 pointing/emulate_touch_from_mouse=true

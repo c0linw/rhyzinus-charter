@@ -15,6 +15,7 @@ func _ready():
 	
 	$PanelContainer/VBoxContainer/TabContainer.set_current_tab(1)
 	$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(0, true)
+	EditorStatus.set_status("Ready")
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -40,6 +41,7 @@ func _on_SaveFileDialog_file_selected(path):
 	file.store_line(JSON.print(file_data))
 	file.close()
 	saved_path = path
+	EditorStatus.set_saved()
 
 func _on_OpenFileDialog_file_selected(path):
 	var file = File.new()
@@ -169,6 +171,7 @@ func perform_toolbar_action(action: int):
 				var file_data = chart_node.get_chart_data()
 				file_data["audio_path"] = $SongAudioPlayer.audio_path
 				file.store_line(JSON.print(file_data))
+				EditorStatus.set_saved()
 			else:
 				$SaveFileDialog.popup_centered()
 			file.close()

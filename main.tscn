@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=2]
+[gd_scene load_steps=31 format=2]
 
 [ext_resource path="res://chart.gd" type="Script" id=1]
 [ext_resource path="res://chart_view.gd" type="Script" id=2]
@@ -19,6 +19,7 @@
 [ext_resource path="res://playback_slider_display.gd" type="Script" id=17]
 [ext_resource path="res://playback_time_label.gd" type="Script" id=18]
 [ext_resource path="res://audio_select_status_label.gd" type="Script" id=19]
+[ext_resource path="res://status_label.gd" type="Script" id=20]
 
 [sub_resource type="StyleBoxFlat" id=2]
 resource_local_to_scene = true
@@ -650,7 +651,7 @@ custom_constants/margin_top = 8
 margin_top = 8.0
 margin_right = 1010.0
 margin_bottom = 22.0
-text = "Ready"
+script = ExtResource( 20 )
 
 [node name="VersionLabel" type="Label" parent="PanelContainer/VBoxContainer/StatusBar"]
 margin_top = 8.0

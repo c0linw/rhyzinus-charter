@@ -310,6 +310,7 @@ func add_note(note_data: Dictionary):
 	hold_pairs = find_hold_pairs(notes)
 	update_note_positions()
 	update()
+	EditorStatus.set_modified()
 		
 func delete_note(note):
 	print("deleting note with time %s, lane %s" % [note.time, note.lane])
@@ -318,6 +319,7 @@ func delete_note(note):
 	hold_pairs = find_hold_pairs(notes)
 	update_note_positions()
 	update()
+	EditorStatus.set_modified()
 	
 # returns a note entity, or null
 func find_note(time: float, lane: int):
@@ -366,7 +368,7 @@ func add_timingpoint(timingpoint_data: Dictionary):
 	update_timingpoint_positions()
 	update_note_positions()
 	update()
-	
+	EditorStatus.set_modified()
 	
 func delete_timingpoint(timingpoint):
 	match timingpoint.type:
@@ -386,7 +388,7 @@ func delete_timingpoint(timingpoint):
 	update_timingpoint_positions()
 	update_note_positions()
 	update()
-	
+	EditorStatus.set_modified()
 	
 # returns a note entity, or null
 func find_timingpoint(time: float, type: String):
@@ -663,6 +665,7 @@ func load_chart_data(chart_data: Dictionary):
 		add_timingpoint(timingpoint_data)
 	for timingpoint_data in chart_data.velocity_changes:
 		add_timingpoint(timingpoint_data)
+	EditorStatus.set_modified()
 
 func reset_chart_data():
 	for note in notes:
