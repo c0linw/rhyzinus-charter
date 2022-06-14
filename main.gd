@@ -8,6 +8,7 @@ signal stream_changed(songaudioplayer)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	get_tree().set_auto_accept_quit(false)
 	chart_node = find_node("Chart")
 	yield(VisualServer, "frame_post_draw")
 	
@@ -42,6 +43,7 @@ func _on_SaveFileDialog_file_selected(path):
 	file.close()
 	saved_path = path
 	EditorStatus.set_saved()
+	EditorStatus.emit_signal("file_saved")
 
 func _on_OpenFileDialog_file_selected(path):
 	var file = File.new()
@@ -117,7 +119,8 @@ func load_audio(path: String):
 	audio_status_label.report_status(err)
 	
 func new_project():
-	# TODO: prompt if want to save?
+	yield(prompt_for_save(), "completed")
+				
 	$SongAudioPlayer.unload_audio()
 	$PanelContainer/VBoxContainer/TabContainer.set_current_tab(1)
 	$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(0, true)
@@ -131,7 +134,10 @@ func new_project():
 
 func _notification(what):
 	if what == MainLoop.NOTIFICATION_WM_QUIT_REQUEST:
-		get_tree().quit() # default behavior. TODO: prompt user for save
+		print(EditorStatus.unsaved_changes)
+		if EditorStatus.unsaved_changes:
+			yield(prompt_for_save(), "completed")
+		get_tree().quit()
 
 
 func _on_TabContainer_tab_changed(tab):
@@ -172,9 +178,20 @@ func perform_toolbar_action(action: int):
 				file_data["audio_path"] = $SongAudioPlayer.audio_path
 				file.store_line(JSON.print(file_data))
 				EditorStatus.set_saved()
+				EditorStatus.emit_signal("file_saved")
 			else:
 				$SaveFileDialog.popup_centered()
 			file.close()
 		actions.SAVEAS: $SaveFileDialog.popup_centered()
 		actions.OPEN: $OpenFileDialog.popup_centered() # open .rzn file
 		actions.IMPORT: $ImportOsuDialog.popup_centered()
+		
+func prompt_for_save():
+	$UnsavedPrompt.popup_centered()
+	print("yielding")
+	var save: bool = yield($UnsavedPrompt, "save_prompt_confirm")
+	print(save)
+	if save:
+		perform_toolbar_action(actions.SAVE)
+		yield(EditorStatus, "file_saved")
+	print("done")

@@ -4,6 +4,7 @@ extends Node
 var unsaved_changes: bool = false
 
 signal status_changed(status)
+signal file_saved()
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
