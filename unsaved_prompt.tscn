@@ -56,6 +56,7 @@ margin_right = 220.0
 margin_bottom = 20.0
 text = "Cancel"
 
+[connection signal="popup_hide" from="." to="." method="_on_UnsavedPrompt_popup_hide"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/Save" to="." method="_on_Save_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/DontSave" to="." method="_on_DontSave_pressed"]
 [connection signal="pressed" from="VBoxContainer/HBoxContainer/Cancel" to="." method="_on_Cancel_pressed"]

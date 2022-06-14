@@ -56,22 +56,7 @@ class TimeSorter:
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	add_timingpoint({
-		"time": 0,
-		"beat_length": 0.5,
-		"meter": 4,
-		"type": "bpm"
-	})
-		
-	notes.sort_custom(TimeSorter, "sort_notes_ascending")
-	bpm_changes.sort_custom(TimeSorter, "sort_ascending")
-	velocity_changes.sort_custom(TimeSorter, "sort_ascending")
-	
-	beats = generate_beats(current_subdivision)
-	
-	update()
-	update_note_positions()
-	update_timingpoint_positions()
+	reset_chart_data()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 # func _process(delta):
@@ -685,6 +670,15 @@ func reset_chart_data():
 		"meter": 4,
 		"type": "bpm"
 	})
+	
+	beats = generate_beats(current_subdivision)
+	
+	update()
+	update_note_positions()
+	update_timingpoint_positions()
+	
+	EditorStatus.set_saved()
+	EditorStatus.set_status("Ready")
 
 func _on_SongAudioPlayer_audio_loaded(new_length):
 	update_chart_length(new_length)
