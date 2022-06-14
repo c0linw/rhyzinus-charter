@@ -1,10 +1,14 @@
 extends Control
 
+enum actions {NEW, SAVE, SAVEAS, OPEN, IMPORT}
+
 var chart_node: Chart
+var saved_path: String = ""
 signal stream_changed(songaudioplayer)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	get_tree().set_auto_accept_quit(false)
 	chart_node = find_node("Chart")
 	yield(VisualServer, "frame_post_draw")
 	
@@ -12,6 +16,7 @@ func _ready():
 	
 	$PanelContainer/VBoxContainer/TabContainer.set_current_tab(1)
 	$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(0, true)
+	EditorStatus.set_status("Ready")
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -21,10 +26,11 @@ func _ready():
 
 func _on_DropdownFileMenu_item_pressed(id):
 	match id:
-		0: new_project()
-		1: $SaveFileDialog.popup_centered()
-		2: $OpenFileDialog.popup_centered() # open .rzn file
-		3: $ImportOsuDialog.popup_centered()
+		0: perform_toolbar_action(actions.NEW)
+		1: perform_toolbar_action(actions.SAVE)
+		2: perform_toolbar_action(actions.SAVEAS)
+		3: perform_toolbar_action(actions.OPEN)
+		4: perform_toolbar_action(actions.IMPORT)
 
 
 func _on_SaveFileDialog_file_selected(path):
@@ -35,11 +41,16 @@ func _on_SaveFileDialog_file_selected(path):
 	file.open(path, File.WRITE)
 	file.store_line(JSON.print(file_data))
 	file.close()
-
+	saved_path = path
+	EditorStatus.set_saved()
+	EditorStatus.emit_signal("file_saved")
 
 func _on_OpenFileDialog_file_selected(path):
 	var file = File.new()
-	file.open(path, File.READ)
+	var err = file.open(path, File.READ)
+	if err != OK:
+		push_error("Failed to open file, err: %s" % err)
+		return
 	var chart_json = file.get_as_text()
 	var result: JSONParseResult = JSON.parse(chart_json)
 	if result.error != OK:
@@ -50,7 +61,7 @@ func _on_OpenFileDialog_file_selected(path):
 		return
 	load_audio(result.result.audio_path)
 	chart_node.load_chart_data(result.result)
-
+	saved_path = path
 
 func _on_ImportOsuDialog_file_selected(path):
 	var result = $OsuConverter.load_chart(path)
@@ -108,7 +119,8 @@ func load_audio(path: String):
 	audio_status_label.report_status(err)
 	
 func new_project():
-	# TODO: prompt if want to save?
+	yield(prompt_for_save(), "completed")
+				
 	$SongAudioPlayer.unload_audio()
 	$PanelContainer/VBoxContainer/TabContainer.set_current_tab(1)
 	$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(0, true)
@@ -118,12 +130,71 @@ func new_project():
 	line_edit.text = ""
 	var audio_status_label = find_node("AudioSelectStatusLabel")
 	audio_status_label.reset_status()
+	saved_path = ""
 
 func _notification(what):
 	if what == MainLoop.NOTIFICATION_WM_QUIT_REQUEST:
-		get_tree().quit() # default behavior. TODO: prompt user for save
+		var quit = true
+		if EditorStatus.unsaved_changes:
+			quit = yield(prompt_for_save(), "completed")
+		if quit:
+			get_tree().quit()
 
 
 func _on_TabContainer_tab_changed(tab):
 	if tab != 0:
 		$SongAudioPlayer.pause()
+		
+func _input(event):
+	if event is InputEventKey and event.pressed and !event.echo:
+		if event.control:
+			match event.scancode:
+				KEY_S:
+					if event.shift:
+						perform_toolbar_action(actions.SAVEAS)
+					else:
+						perform_toolbar_action(actions.SAVE)
+				KEY_O:
+					perform_toolbar_action(actions.OPEN)
+				KEY_N:
+					perform_toolbar_action(actions.NEW)
+				KEY_I:
+					perform_toolbar_action(actions.IMPORT)
+					
+func perform_toolbar_action(action: int):
+	for node in get_tree().get_nodes_in_group("popups"):
+		node.hide()
+	match action:
+		actions.NEW: new_project()
+		actions.SAVE: 
+			var file_valid: bool = false
+			var file = File.new()
+			if saved_path != "":
+				var err = file.open(saved_path, File.WRITE)
+				if err == OK:
+					file_valid = true
+			
+			if file_valid:
+				var file_data = chart_node.get_chart_data()
+				file_data["audio_path"] = $SongAudioPlayer.audio_path
+				file.store_line(JSON.print(file_data))
+				EditorStatus.set_saved()
+				EditorStatus.emit_signal("file_saved")
+			else:
+				$SaveFileDialog.popup_centered()
+			file.close()
+		actions.SAVEAS: $SaveFileDialog.popup_centered()
+		actions.OPEN: $OpenFileDialog.popup_centered() # open .rzn file
+		actions.IMPORT: $ImportOsuDialog.popup_centered()
+		
+		
+# returns true if the prompt wasn't cancelled (either by the X button or "cancel button)
+func prompt_for_save() -> bool:
+	$UnsavedPrompt.call_deferred("popup_centered")
+	var option: int = yield($UnsavedPrompt, "save_prompt_confirm")
+	if option == 2:
+		return false
+	if option == 0:
+		perform_toolbar_action(actions.SAVE)
+		yield(EditorStatus, "file_saved")
+	return true
