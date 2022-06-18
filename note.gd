@@ -34,6 +34,8 @@ func set_data(note_data: Dictionary):
 				$TextureRect.texture = load("res://images/hold_end.png")
 			"tap":
 				$TextureRect.texture = load("res://images/tap.png")
+			"swipe":
+				$TextureRect.texture = load("res://images/swipe.png")
 	elif lane == 0 || lane == 7:
 		set_size(Vector2(base_lane_width, note_height))
 		note_color = Color(1,1,0.1,1)
@@ -44,6 +46,8 @@ func set_data(note_data: Dictionary):
 				$TextureRect.texture = load("res://images/hold_end.png")
 			"tap":
 				$TextureRect.texture = load("res://images/tap.png")
+			"swipe":
+				$TextureRect.texture = load("res://images/swipe.png")
 		modulate = note_color
 	elif lane >= 10 and lane <= 13:
 		set_size(Vector2(base_lane_width*1.5, note_height))
