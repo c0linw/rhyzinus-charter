@@ -1,9 +1,9 @@
 extends AudioStreamPlayer
 
-const BUS_NAME = "Pitch"
-const BUS_INDEX = 1
-const EFF_INDEX = 0
 
+const CUSTOM_STREAM_OFFSET = 0.05 # for some reason fire-and-forget sounds have a different latency from the instantiated sound
+
+var chart_node: Node
 var audio_path: String = ""
 
 var custom_stream: ShinobuGodotSoundPlayback
@@ -13,6 +13,9 @@ var song_position: float = 0.0
 var paused_position: float = 0.0
 var playback_speed: float = 1.0
 
+var queued_sfx_times: Array = [] # array of floats corresponding to note times
+var sfx_index: int = 0
+
 signal song_position_updated(new_position, max_position)
 signal audio_loaded(new_length)
 
@@ -20,6 +23,13 @@ signal audio_loaded(new_length)
 func _ready():
 	ShinobuGodot.initialize()
 	pitch_shift = ShinobuGodot.instantiate_pitch_shift()
+	
+	chart_node = get_tree().get_nodes_in_group("chart")[0]
+	
+	# load the note sound effect
+	var note_effect = ShinobuGodot.register_sound_from_path("res://sound/click.wav", "click")
+	ShinobuGodot.register_group("click_group")
+	ShinobuGodot.set_group_volume("click_group", 0.2)
 
 func load_audio(path: String) -> int:
 	# shinobu audio will literally try to load any file, so at least check the filetype (maybe try header check when i have more time)
@@ -50,10 +60,14 @@ func unload_audio():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	update_song_position()
+	if custom_stream != null and custom_stream.is_playing() and len(queued_sfx_times) > 0:
+		while sfx_index < len(queued_sfx_times) and song_position >= queued_sfx_times[sfx_index]:
+			ShinobuGodot.fire_and_forget_sound("click", "click_group")
+			sfx_index += 1
 
 func update_song_position():
 	if custom_stream != null and custom_stream.is_playing():
-		var new_position = get_playback_position()
+		var new_position = get_playback_position() - ShinobuGodot.get_actual_buffer_size() / 1000.0
 		if new_position > song_position:
 			song_position = new_position
 			emit_signal("song_position_updated", song_position, get_stream_length())
@@ -80,13 +94,17 @@ func seek(to_position: float):
 	var new_position_ms = to_position * 1000
 	custom_stream.seek(new_position_ms)
 	song_position = to_position
+	
+	queued_sfx_times = chart_node.get_note_times_since_time(to_position)
+	sfx_index = 0
+	
 	if previously_playing:
 		custom_stream.start()
 	
 func get_playback_position() -> float:
 	if custom_stream == null:
 		return 0.0
-	return (custom_stream.get_playback_position_msec() - ShinobuGodot.get_actual_buffer_size()) / 1000.0
+	return (custom_stream.get_playback_position_msec() - ShinobuGodot.get_actual_buffer_size()) / 1000.0 - CUSTOM_STREAM_OFFSET
 	
 func get_stream_length() -> float:
 	if custom_stream == null:

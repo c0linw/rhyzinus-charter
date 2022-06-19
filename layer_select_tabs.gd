@@ -10,7 +10,7 @@ signal tab_selected(name)
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	yield(get_tree(), "idle_frame")
-	_on_custom_tab_selected(0)
+	_on_custom_tab_selected(2)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
