@@ -3,7 +3,7 @@ class_name Note
 
 var time: float
 var lane: int
-var type: String # "tap", "hold", or "swipe"
+var type: String # "tap", "hold_start", "hold_end" or "swipe"
 
 var note_height = 16
 var base_lane_width = 64

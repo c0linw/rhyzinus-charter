@@ -682,3 +682,10 @@ func reset_chart_data():
 
 func _on_SongAudioPlayer_audio_loaded(new_length):
 	update_chart_length(new_length)
+
+func get_note_times_since_time(time: float) -> Array:
+	var times = []
+	for note in notes:
+		if note.time > time and note.type != "hold_end":
+			times.append(note.time)
+	return times
