@@ -1,6 +1,6 @@
 extends Control
 
-enum actions {NEW, SAVE, SAVEAS, OPEN, IMPORT}
+enum actions {NEW, SAVE, SAVEAS, OPEN, IMPORT, EXPORT}
 
 var chart_node: Chart
 var saved_path: String = ""
@@ -31,6 +31,7 @@ func _on_DropdownFileMenu_item_pressed(id):
 		2: perform_toolbar_action(actions.SAVEAS)
 		3: perform_toolbar_action(actions.OPEN)
 		4: perform_toolbar_action(actions.IMPORT)
+		5: perform_toolbar_action(actions.EXPORT)
 
 
 func _on_SaveFileDialog_file_selected(path):
@@ -46,29 +47,30 @@ func _on_SaveFileDialog_file_selected(path):
 	EditorStatus.emit_signal("file_saved")
 
 func _on_OpenFileDialog_file_selected(path):
-	var file = File.new()
-	var err = file.open(path, File.READ)
-	if err != OK:
-		push_error("Failed to open file, err: %s" % err)
-		return
-	var chart_json = file.get_as_text()
-	var result: JSONParseResult = JSON.parse(chart_json)
-	if result.error != OK:
-		push_error("File parsing failed at line %s: %s" % [result.error_line, result.error_string])
-		return
-	if typeof(result.result) != TYPE_DICTIONARY:
-		push_error("chart data was not parsed as Dictionary")
-		return
-	load_audio(result.result.audio_path)
-	chart_node.load_chart_data(result.result)
-	saved_path = path
+	open_rzn(path)
 
-func _on_ImportOsuDialog_file_selected(path):
-	var result = $OsuConverter.load_chart(path)
-	if result == null:
-		push_error(".osu chart loading failed")
-		return
-	chart_node.load_chart_data(result)
+func _on_ImportFileDialog_file_selected(path):
+	if path.ends_with(".osu"):
+		var result = $OsuConverter.load_chart(path)
+		if result == null:
+			push_error(".osu chart loading failed")
+			return
+		chart_node.load_chart_data(result)
+	elif path.ends_with(".rzn.gz"):
+		open_rzn(path)
+
+
+func _on_ExportFileDialog_file_selected(path):
+	var file_data = chart_node.get_chart_data()
+	file_data["audio_path"] = $SongAudioPlayer.audio_path
+	
+	var file = File.new()
+	file.open_compressed(path, File.WRITE, File.COMPRESSION_GZIP)
+	file.store_line(JSON.print(file_data))
+	file.close()
+	saved_path = path
+	EditorStatus.set_saved()
+	EditorStatus.emit_signal("file_saved")
 
 
 func _on_PlayButton_pressed():
@@ -160,6 +162,8 @@ func _input(event):
 					perform_toolbar_action(actions.NEW)
 				KEY_I:
 					perform_toolbar_action(actions.IMPORT)
+				KEY_E:
+					perform_toolbar_action(actions.EXPORT)
 					
 func perform_toolbar_action(action: int):
 	for node in get_tree().get_nodes_in_group("popups"):
@@ -185,7 +189,8 @@ func perform_toolbar_action(action: int):
 			file.close()
 		actions.SAVEAS: $SaveFileDialog.popup_centered()
 		actions.OPEN: $OpenFileDialog.popup_centered() # open .rzn file
-		actions.IMPORT: $ImportOsuDialog.popup_centered()
+		actions.IMPORT: $ImportFileDialog.popup_centered()
+		actions.EXPORT: $ExportFileDialog.popup_centered()
 		
 		
 # returns true if the prompt wasn't cancelled (either by the X button or "cancel button)
@@ -198,3 +203,31 @@ func prompt_for_save() -> bool:
 		perform_toolbar_action(actions.SAVE)
 		yield(EditorStatus, "file_saved")
 	return true
+
+func open_rzn(path):
+	var file = File.new()
+	var err
+	if path.ends_with(".rzn"):
+		err = file.open(path, File.READ)
+	elif path.ends_with(".rzn.gz"):
+		err = file.open_compressed(path, File.READ, File.COMPRESSION_GZIP)
+	else:
+		push_error("Unrecognized file extension")
+		file.close()
+		return
+	if err != OK:
+		push_error("Failed to open file, err: %s" % err)
+		file.close()
+		return
+	var chart_json = file.get_as_text()
+	file.close()
+	var result: JSONParseResult = JSON.parse(chart_json)
+	if result.error != OK:
+		push_error("File parsing failed at line %s: %s" % [result.error_line, result.error_string])
+		return
+	if typeof(result.result) != TYPE_DICTIONARY:
+		push_error("chart data was not parsed as Dictionary")
+		return
+	load_audio(result.result.audio_path)
+	chart_node.load_chart_data(result.result)
+	saved_path = path

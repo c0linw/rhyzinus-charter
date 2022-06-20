@@ -203,7 +203,7 @@ margin_bottom = 20.0
 margin_right = 35.0
 margin_bottom = 20.0
 text = "File"
-items = [ "New (Ctrl+N)", null, 0, false, false, 0, 0, null, "", false, "Save (Ctrl+S)", null, 0, false, false, 1, 0, null, "", false, "Save As (Ctrl+Shift+S)", null, 0, false, false, 2, 0, null, "", false, "Open (Ctrl+O)", null, 0, false, false, 3, 0, null, "", false, "Import .osu file (Ctrl+I)", null, 0, false, false, 4, 0, null, "", false ]
+items = [ "New (Ctrl+N)", null, 0, false, false, 0, 0, null, "", false, "Save (Ctrl+S)", null, 0, false, false, 1, 0, null, "", false, "Save As (Ctrl+Shift+S)", null, 0, false, false, 2, 0, null, "", false, "Open (Ctrl+O)", null, 0, false, false, 3, 0, null, "", false, "Import (Ctrl+I)", null, 0, false, false, 4, 0, null, "", false, "Export (Ctrl+E)", null, 0, false, false, 5, 0, null, "", false ]
 script = ExtResource( 12 )
 
 [node name="HSeparator" type="HSeparator" parent="PanelContainer/VBoxContainer"]
@@ -718,7 +718,7 @@ margin_top = -75.5
 margin_right = 94.5
 margin_bottom = 75.5
 
-[node name="ImportOsuDialog" type="FileDialog" parent="." groups=["popups"]]
+[node name="ImportFileDialog" type="FileDialog" parent="." groups=["popups"]]
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
@@ -732,13 +732,28 @@ window_title = "Open a File"
 resizable = true
 mode = 0
 access = 2
-filters = PoolStringArray( "*.osu ; osu!mania beatmaps" )
+filters = PoolStringArray( "*.osu ; osu!mania beatmaps", "*.rzn.gz ; Compressed Rhyzinus charts" )
 show_hidden_files = true
 current_dir = "/Users/wangc/Documents/rhyzinus-charter"
 current_path = "/Users/wangc/Documents/rhyzinus-charter/"
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="ExportFileDialog" type="FileDialog" parent="." groups=["popups"]]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -271.0
+margin_top = -181.0
+margin_right = 271.0
+margin_bottom = 181.0
+access = 2
+filters = PoolStringArray( "*.rzn.gz ; Compressed Rhyzinus charts" )
+show_hidden_files = true
+current_dir = "/Users/wangc/Documents/rhyzinus-charter"
+current_path = "/Users/wangc/Documents/rhyzinus-charter/"
 
 [node name="OpenFileDialog" type="FileDialog" parent="." groups=["popups"]]
 anchor_left = 0.5
@@ -826,6 +841,7 @@ __meta__ = {
 [connection signal="song_position_updated" from="SongAudioPlayer" to="PanelContainer/VBoxContainer/TabContainer/Edit/MarginContainer/PlaybackHBoxContainer/MarginContainer/PlaybackSliderDisplay" method="_on_SongAudioPlayer_song_position_updated"]
 [connection signal="file_selected" from="OpenAudioDialog" to="." method="_on_OpenAudioDialog_file_selected"]
 [connection signal="set_bpm_point" from="BPMTimingPointDialog" to="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer/ChartView/Chart" method="_on_BPMTimingPointDialog_set_bpm_point"]
-[connection signal="file_selected" from="ImportOsuDialog" to="." method="_on_ImportOsuDialog_file_selected"]
+[connection signal="file_selected" from="ImportFileDialog" to="." method="_on_ImportFileDialog_file_selected"]
+[connection signal="file_selected" from="ExportFileDialog" to="." method="_on_ExportFileDialog_file_selected"]
 [connection signal="file_selected" from="OpenFileDialog" to="." method="_on_OpenFileDialog_file_selected"]
 [connection signal="file_selected" from="SaveFileDialog" to="." method="_on_SaveFileDialog_file_selected"]
