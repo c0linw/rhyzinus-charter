@@ -121,8 +121,6 @@ func load_audio(path: String):
 	audio_status_label.report_status(err)
 	
 func new_project():
-	yield(prompt_for_save(), "completed")
-				
 	$SongAudioPlayer.unload_audio()
 	$PanelContainer/VBoxContainer/TabContainer.set_current_tab(1)
 	$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(0, true)
@@ -169,7 +167,10 @@ func perform_toolbar_action(action: int):
 	for node in get_tree().get_nodes_in_group("popups"):
 		node.hide()
 	match action:
-		actions.NEW: new_project()
+		actions.NEW: 
+			if EditorStatus.unsaved_changes:
+				yield(prompt_for_save(), "completed")
+			new_project()
 		actions.SAVE: 
 			var file_valid: bool = false
 			var file = File.new()
@@ -188,8 +189,14 @@ func perform_toolbar_action(action: int):
 				$SaveFileDialog.popup_centered()
 			file.close()
 		actions.SAVEAS: $SaveFileDialog.popup_centered()
-		actions.OPEN: $OpenFileDialog.popup_centered() # open .rzn file
-		actions.IMPORT: $ImportFileDialog.popup_centered()
+		actions.OPEN: 
+			if EditorStatus.unsaved_changes:
+				yield(prompt_for_save(), "completed")
+			$OpenFileDialog.popup_centered() # open .rzn file
+		actions.IMPORT: 
+			if EditorStatus.unsaved_changes:
+				yield(prompt_for_save(), "completed")
+			$ImportFileDialog.popup_centered()
 		actions.EXPORT: $ExportFileDialog.popup_centered()
 		
 		

@@ -650,7 +650,8 @@ func load_chart_data(chart_data: Dictionary):
 		add_timingpoint(timingpoint_data)
 	for timingpoint_data in chart_data.velocity_changes:
 		add_timingpoint(timingpoint_data)
-	EditorStatus.set_modified()
+	EditorStatus.set_saved()
+	EditorStatus.set_status("Ready")
 
 func reset_chart_data():
 	for note in notes:
