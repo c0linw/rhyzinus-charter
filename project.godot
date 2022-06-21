@@ -35,6 +35,7 @@ _global_script_class_icons={
 config/name="Rhyzinus-charter"
 run/main_scene="res://main.tscn"
 config/icon="res://icon.png"
+config/windows_native_icon="res://icon.ico"
 
 [autoload]
 

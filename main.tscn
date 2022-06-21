@@ -680,7 +680,7 @@ script = ExtResource( 20 )
 margin_top = 8.0
 margin_right = 1010.0
 margin_bottom = 22.0
-text = "Pre-release"
+text = "v0.1"
 align = 2
 
 [node name="SongAudioPlayer" type="AudioStreamPlayer" parent="."]
