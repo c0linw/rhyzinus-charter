@@ -593,6 +593,7 @@ func _on_BPMTimingPointDialog_set_bpm_point(instance, offset, bpm, meter):
 			update()
 			
 			get_tree().get_nodes_in_group("bpm_timingpoint_dialog")[0].hide()
+			EditorStatus.set_modified()
 			return
 
 
