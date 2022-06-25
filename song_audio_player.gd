@@ -27,7 +27,7 @@ func _ready():
 	chart_node = get_tree().get_nodes_in_group("chart")[0]
 	
 	# load the note sound effect
-	var note_effect = ShinobuGodot.register_sound_from_path("res://sound/click.wav", "click")
+	var note_effect = ShinobuGodot.register_sound_from_path("res://sound/click", "click")
 	ShinobuGodot.register_group("click_group")
 	ShinobuGodot.set_group_volume("click_group", 0.2)
 
