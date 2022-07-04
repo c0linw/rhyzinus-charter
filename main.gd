@@ -56,7 +56,7 @@ func _on_ImportFileDialog_file_selected(path):
 			push_error(".osu chart loading failed")
 			return
 		chart_node.load_chart_data(result)
-	elif path.ends_with(".rzn.gz"):
+	elif path.ends_with(".rznx"):
 		open_rzn(path)
 
 
@@ -65,7 +65,7 @@ func _on_ExportFileDialog_file_selected(path):
 	file_data["audio_path"] = $SongAudioPlayer.audio_path
 	
 	var file = File.new()
-	file.open_compressed(path, File.WRITE, File.COMPRESSION_GZIP)
+	file.open_compressed(path, File.WRITE, File.COMPRESSION_DEFLATE)
 	file.store_line(JSON.print(file_data))
 	file.close()
 	saved_path = path
@@ -216,8 +216,8 @@ func open_rzn(path):
 	var err
 	if path.ends_with(".rzn"):
 		err = file.open(path, File.READ)
-	elif path.ends_with(".rzn.gz"):
-		err = file.open_compressed(path, File.READ, File.COMPRESSION_GZIP)
+	elif path.ends_with(".rznx"):
+		err = file.open_compressed(path, File.READ, File.COMPRESSION_DEFLATE)
 	else:
 		push_error("Unrecognized file extension")
 		file.close()
