@@ -600,11 +600,17 @@ func _on_BPMTimingPointDialog_set_bpm_point(instance, offset, bpm, meter):
 func get_chart_data() -> Dictionary:
 	var note_data: Array = []
 	for note in notes:
-		note_data.append({
+		var new_data: Dictionary = {
 			"time": note.time,
 			"type": note.type,
 			"lane": note.lane,
-		})
+		}
+		
+		if note.type == "hold_start":
+			for pair in hold_pairs:
+				if pair[0].time == note.time and pair[0].lane == note.lane:
+					new_data["end_time"] = pair[1].time
+		note_data.append(new_data)
 	
 	var bpm_data: Array = []
 	for timingpoint in bpm_changes:
