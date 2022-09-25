@@ -3,21 +3,22 @@ extends Node
 
 const CUSTOM_STREAM_OFFSET = 0.05 # for some reason fire-and-forget sounds have a different latency from the instantiated sound
 
+enum sfx_enums {SFX_NONE, SFX_CLICK, SFX_SWIPE}
+
 var chart_node: Node
 var audio_path: String = ""
 
 var custom_stream: ShinobuSoundPlayer
 var pitch_shift: ShinobuPitchShiftEffect
 var music_group: ShinobuGroup
-
-var click_source: ShinobuSoundSourceMemory
-var click_group: ShinobuGroup
+var sfx_group: ShinobuGroup
 
 var song_position: float = 0.0
 var paused_position: float = 0.0
 var playback_speed: float = 1.0
 
-var queued_sfx_times: Array = [] # array of floats corresponding to note times
+var sfx_sources: Array
+var queued_sfx_times: Array = [] # array of Dictionaries, containing note times and sound enumerator
 var sfx_index: int = 0
 var played_sfxs: Array = [] # manually free these when each one is done
 
@@ -31,15 +32,24 @@ func _ready():
 	
 	chart_node = get_tree().get_nodes_in_group("chart")[0]
 	
-	# load the note sound effect
+	# load the note sound effects
 	var click_file = File.new()
 	click_file.open("res://sound/click.wav", File.READ)
 	var buffer = click_file.get_buffer(click_file.get_len())
 	click_file.close()
-	click_source = Shinobu.register_sound_from_memory("click", buffer)
-	click_group = Shinobu.create_group("click_group", null)
-	click_group.set_volume(0.5)
+	var click_source = Shinobu.register_sound_from_memory("click", buffer)
 	
+	var swipe_file = File.new()
+	swipe_file.open("res://sound/swipe.wav", File.READ)
+	var buffer2 = swipe_file.get_buffer(swipe_file.get_len())
+	swipe_file.close()
+	var swipe_source = Shinobu.register_sound_from_memory("swipe", buffer2)
+	
+	sfx_sources.resize(sfx_enums.size())
+	sfx_sources[sfx_enums.SFX_CLICK] = click_source
+	sfx_sources[sfx_enums.SFX_SWIPE] = swipe_source
+	
+	sfx_group = Shinobu.create_group("sfx_group", null)
 	music_group = Shinobu.create_group("music", null)
 
 func load_audio(path: String) -> int:
@@ -80,15 +90,17 @@ func unload_audio():
 func _process(delta):
 	update_song_position()
 	if custom_stream != null and custom_stream.is_playing() and len(queued_sfx_times) > 0:
-		while sfx_index < len(queued_sfx_times) and song_position >= queued_sfx_times[sfx_index]:
-			var click_sound = click_source.instantiate(click_group)
-			played_sfxs.append(click_sound)
-			click_sound.start()
+		while sfx_index < len(queued_sfx_times) and song_position >= queued_sfx_times[sfx_index].time:
+			var sfx_source = sfx_sources[queued_sfx_times[sfx_index].type]
+			if sfx_source != null:
+				var sfx_player = sfx_source.instantiate(sfx_group)
+				played_sfxs.append(sfx_player)
+				sfx_player.start()
 			sfx_index += 1
-	for soundplayer in played_sfxs.duplicate():
-		if soundplayer.is_at_stream_end():
-			soundplayer.queue_free()
-			played_sfxs.erase(soundplayer)
+	for sfx_player in played_sfxs.duplicate():
+		if sfx_player.is_at_stream_end():
+			sfx_player.queue_free()
+			played_sfxs.erase(sfx_player)
 
 func update_song_position():
 	if custom_stream != null and custom_stream.is_playing():
@@ -150,6 +162,9 @@ func is_playing() -> bool:
 func set_volume(linear_volume: float):
 	if custom_stream != null:
 		custom_stream.set_volume(linear_volume)
+		
+func set_sfx_volume(linear_volume: float):
+	sfx_group.set_volume(linear_volume)
 	
 func set_playback_speed(speed: float):
 	pitch_shift.set_pitch_scale(1.0/speed)

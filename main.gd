@@ -84,6 +84,10 @@ func _on_VolumeSpinBox_value_changed(value):
 	$SongAudioPlayer.set_volume(value/100.0)
 
 
+func _on_SFXVolumeSpinBox_value_changed(value):
+	$SongAudioPlayer.set_sfx_volume(value/100.0)
+	
+
 func _on_SelectAudioButton_pressed():
 	$OpenAudioDialog.popup_centered()
 

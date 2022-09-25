@@ -231,19 +231,19 @@ margin_bottom = -4.0
 
 [node name="ToolbarHBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer/TabContainer/Edit"]
 margin_right = 1002.0
-margin_bottom = 48.0
+margin_bottom = 52.0
 
 [node name="SubdivisionLabel" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer"]
-margin_top = 17.0
+margin_top = 19.0
 margin_right = 81.0
-margin_bottom = 31.0
+margin_bottom = 33.0
 text = "Subdivision: "
 
 [node name="SubdivisionOption" type="OptionButton" parent="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer"]
 margin_left = 85.0
-margin_top = 14.0
+margin_top = 16.0
 margin_right = 183.0
-margin_bottom = 34.0
+margin_bottom = 36.0
 size_flags_vertical = 4
 text = "1/4 (16ths)"
 script = ExtResource( 7 )
@@ -251,12 +251,13 @@ script = ExtResource( 7 )
 [node name="VSeparator" type="VSeparator" parent="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer"]
 margin_left = 187.0
 margin_right = 191.0
-margin_bottom = 48.0
+margin_bottom = 52.0
 
 [node name="ZoomMinus" type="Button" parent="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer"]
 margin_left = 195.0
+margin_top = 2.0
 margin_right = 243.0
-margin_bottom = 48.0
+margin_bottom = 50.0
 rect_min_size = Vector2( 48, 48 )
 size_flags_vertical = 4
 icon = ExtResource( 9 )
@@ -264,8 +265,9 @@ expand_icon = true
 
 [node name="ZoomPlus" type="Button" parent="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer"]
 margin_left = 247.0
+margin_top = 2.0
 margin_right = 295.0
-margin_bottom = 48.0
+margin_bottom = 50.0
 rect_min_size = Vector2( 48, 48 )
 size_flags_vertical = 4
 icon = ExtResource( 8 )
@@ -274,55 +276,73 @@ expand_icon = true
 [node name="VSeparator2" type="VSeparator" parent="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer"]
 margin_left = 299.0
 margin_right = 303.0
-margin_bottom = 48.0
+margin_bottom = 52.0
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer"]
 margin_left = 307.0
-margin_right = 438.0
-margin_bottom = 48.0
-alignment = 1
+margin_right = 407.0
+margin_bottom = 52.0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer/VBoxContainer"]
-margin_right = 131.0
-margin_bottom = 20.0
-
-[node name="PlaySpeedLabel" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer/VBoxContainer/HBoxContainer"]
-margin_top = 3.0
+[node name="PlaySpeedLabel" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer/HBoxContainer"]
+margin_top = 19.0
 margin_right = 47.0
-margin_bottom = 17.0
+margin_bottom = 33.0
 text = "Speed: "
 
-[node name="PlaySpeedOption" type="OptionButton" parent="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer/VBoxContainer/HBoxContainer"]
+[node name="PlaySpeedOption" type="OptionButton" parent="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer/HBoxContainer"]
 margin_left = 51.0
+margin_top = 16.0
 margin_right = 100.0
-margin_bottom = 20.0
+margin_bottom = 36.0
 size_flags_vertical = 4
 text = "1.0"
 items = [ "0.25", null, false, 0, null, "0.5", null, false, 1, null, "0.75", null, false, 2, null, "1.0", null, false, 3, null ]
 selected = 3
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer/VBoxContainer"]
-margin_top = 24.0
-margin_right = 131.0
-margin_bottom = 48.0
+[node name="VSeparator3" type="VSeparator" parent="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer"]
+margin_left = 411.0
+margin_right = 415.0
+margin_bottom = 52.0
 
-[node name="VolumeLabel" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer/VBoxContainer/HBoxContainer2"]
+[node name="GridContainer" type="GridContainer" parent="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer"]
+margin_left = 419.0
+margin_right = 543.0
+margin_bottom = 52.0
+columns = 2
+
+[node name="MusicVolumeLabel" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer/GridContainer"]
 margin_top = 5.0
-margin_right = 53.0
+margin_right = 46.0
 margin_bottom = 19.0
-text = "Volume:"
+text = "Music:"
 
-[node name="VolumeSpinBox" type="SpinBox" parent="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer/VBoxContainer/HBoxContainer2"]
-margin_left = 57.0
-margin_right = 131.0
+[node name="MusicVolumeSpinBox" type="SpinBox" parent="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer/GridContainer"]
+margin_left = 50.0
+margin_right = 124.0
 margin_bottom = 24.0
 step = 5.0
 value = 100.0
 rounded = true
 suffix = "%"
 
+[node name="SFXVolumeLabel" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer/GridContainer"]
+margin_top = 33.0
+margin_right = 46.0
+margin_bottom = 47.0
+text = "Effects:"
+
+[node name="SFXVolumeSpinBox" type="SpinBox" parent="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer/GridContainer"]
+margin_left = 50.0
+margin_top = 28.0
+margin_right = 124.0
+margin_bottom = 52.0
+step = 5.0
+value = 100.0
+rounded = true
+suffix = "%"
+
 [node name="EditorHBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer/TabContainer/Edit"]
-margin_top = 52.0
+margin_top = 56.0
 margin_right = 1002.0
 margin_bottom = 464.0
 size_flags_horizontal = 3
@@ -331,13 +351,13 @@ custom_constants/separation = 0
 
 [node name="LayerSelectTabs" type="HBoxContainer" parent="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer"]
 margin_right = 200.0
-margin_bottom = 412.0
+margin_bottom = 408.0
 rect_min_size = Vector2( 200, 0 )
 script = ExtResource( 5 )
 
 [node name="TabContainer" type="TabContainer" parent="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/LayerSelectTabs"]
 margin_right = 141.0
-margin_bottom = 412.0
+margin_bottom = 408.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 tab_align = 0
@@ -428,7 +448,7 @@ type = "velocity"
 [node name="VerticalTabs" type="VBoxContainer" parent="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/LayerSelectTabs"]
 margin_left = 145.0
 margin_right = 200.0
-margin_bottom = 412.0
+margin_bottom = 408.0
 
 [node name="Lower" type="Button" parent="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/LayerSelectTabs/VerticalTabs"]
 margin_right = 55.0
@@ -464,7 +484,7 @@ tab_index = 2
 [node name="PanelContainer" type="PanelContainer" parent="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer"]
 margin_left = 200.0
 margin_right = 746.0
-margin_bottom = 412.0
+margin_bottom = 408.0
 mouse_filter = 1
 size_flags_vertical = 3
 
@@ -472,12 +492,12 @@ size_flags_vertical = 3
 margin_left = 7.0
 margin_top = 7.0
 margin_right = 539.0
-margin_bottom = 405.0
+margin_bottom = 401.0
 custom_constants/separation = 0
 
 [node name="ChartView" type="ScrollContainer" parent="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer"]
 margin_right = 532.0
-margin_bottom = 394.0
+margin_bottom = 390.0
 rect_min_size = Vector2( 532, 0 )
 mouse_filter = 2
 size_flags_horizontal = 0
@@ -491,7 +511,7 @@ script = ExtResource( 2 )
 margin_left = 1.0
 margin_top = 1.0
 margin_right = 531.0
-margin_bottom = 393.0
+margin_bottom = 389.0
 grow_vertical = 0
 rect_min_size = Vector2( 480, 0 )
 size_flags_horizontal = 3
@@ -510,9 +530,6 @@ __meta__ = {
 margin_right = 40.0
 margin_bottom = 40.0
 mouse_filter = 1
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="Timing" type="Control" parent="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer/ChartView/Chart"]
 margin_right = 40.0
@@ -523,9 +540,9 @@ __meta__ = {
 }
 
 [node name="Playhead" type="ColorRect" parent="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer"]
-margin_top = 394.0
+margin_top = 390.0
 margin_right = 532.0
-margin_bottom = 398.0
+margin_bottom = 394.0
 rect_min_size = Vector2( 0, 4 )
 size_flags_horizontal = 3
 color = Color( 1, 0, 0, 1 )
@@ -680,7 +697,7 @@ script = ExtResource( 20 )
 margin_top = 8.0
 margin_right = 1010.0
 margin_bottom = 22.0
-text = "v0.1"
+text = "v0.2"
 align = 2
 
 [node name="SongAudioPlayer" type="Node" parent="."]
@@ -802,8 +819,9 @@ __meta__ = {
 [connection signal="subdivision_changed" from="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer/SubdivisionOption" to="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer/ChartView/Chart" method="_on_SubdivisionOption_subdivision_changed"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer/ZoomMinus" to="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer/ChartView/Chart" method="_on_ZoomMinus_pressed"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer/ZoomPlus" to="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer/ChartView/Chart" method="_on_ZoomPlus_pressed"]
-[connection signal="item_selected" from="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer/VBoxContainer/HBoxContainer/PlaySpeedOption" to="." method="_on_PlaySpeedOption_item_selected"]
-[connection signal="value_changed" from="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer/VBoxContainer/HBoxContainer2/VolumeSpinBox" to="." method="_on_VolumeSpinBox_value_changed"]
+[connection signal="item_selected" from="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer/HBoxContainer/PlaySpeedOption" to="." method="_on_PlaySpeedOption_item_selected"]
+[connection signal="value_changed" from="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer/GridContainer/MusicVolumeSpinBox" to="." method="_on_VolumeSpinBox_value_changed"]
+[connection signal="value_changed" from="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer/GridContainer/SFXVolumeSpinBox" to="." method="_on_SFXVolumeSpinBox_value_changed"]
 [connection signal="tab_selected" from="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/LayerSelectTabs" to="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer/ChartView/Chart" method="_on_LayerSelectTabs_tab_selected"]
 [connection signal="notetype_selected" from="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/LayerSelectTabs/TabContainer/Lower/TapSelect" to="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer/ChartView/Chart" method="_on_notetype_selected"]
 [connection signal="notetype_selected" from="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/LayerSelectTabs/TabContainer/Lower/HoldStartSelect" to="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer/ChartView/Chart" method="_on_notetype_selected"]

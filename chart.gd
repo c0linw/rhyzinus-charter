@@ -7,6 +7,16 @@ const MIN_ZOOM = 64
 
 enum {LAYER_LOWER, LAYER_UPPER, LAYER_TIMING}
 
+enum {SFX_NONE, SFX_CLICK, SFX_SWIPE}
+
+var note_type_to_sfx_enum: Dictionary = {
+	"": SFX_NONE, 
+	"tap": SFX_CLICK, 
+	"hold_start": SFX_CLICK, 
+	"hold_end": SFX_NONE, 
+	"swipe": SFX_SWIPE, 
+}
+
 var notes: Array = [] # Array of ObjNote entities
 var bpm_changes: Array = [] # Array of ObjTimingPoint instances, bpm changes only
 var velocity_changes: Array = [] # Array of ObjTimingPoint instances, velocity changes only
@@ -694,6 +704,11 @@ func _on_SongAudioPlayer_audio_loaded(new_length):
 func get_note_times_since_time(time: float) -> Array:
 	var times = []
 	for note in notes:
-		if note.time > time and note.type != "hold_end":
-			times.append(note.time)
+		if note.time > time:
+			var type_enum = note_type_to_sfx_enum[note.type]
+			if type_enum != SFX_NONE:
+				times.append({
+					"time": note.time, 
+					"type": type_enum
+					})
 	return times
