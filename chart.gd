@@ -1,10 +1,6 @@
 extends Control
 class_name Chart
 
-const ZOOM_INCREMENT = 64
-const MAX_ZOOM = 1024
-const MIN_ZOOM = 64
-
 enum {LAYER_LOWER, LAYER_UPPER, LAYER_TIMING}
 
 enum {SFX_NONE, SFX_CLICK, SFX_SWIPE}
@@ -14,14 +10,17 @@ var note_type_to_sfx_enum: Dictionary = {
 	"tap": SFX_CLICK, 
 	"hold_start": SFX_CLICK, 
 	"hold_end": SFX_NONE, 
-	"swipe": SFX_SWIPE, 
+	"swipe": SFX_SWIPE
 }
+
+var zoom_levels = [64, 80, 96, 128, 160, 192, 240, 288, 336, 384, 448, 512]
+var zoom_index = 5
 
 var notes: Array = [] # Array of ObjNote entities
 var bpm_changes: Array = [] # Array of ObjTimingPoint instances, bpm changes only
 var velocity_changes: Array = [] # Array of ObjTimingPoint instances, velocity changes only
 var beats: Array = []
-var pixels_per_second = 192 # determines "vertical" scale of chart display
+var pixels_per_second = zoom_levels[zoom_index] # determines "vertical" scale of chart display
 var note_height = 16
 var base_lane_width = 64
 var current_song_position = 0
@@ -557,9 +556,10 @@ func _on_LayerSelectTabs_tab_selected(name):
 
 
 func _on_ZoomMinus_pressed():
-	if pixels_per_second <= MIN_ZOOM :
+	if zoom_index - 1 < 0:
 		return
-	pixels_per_second = max(pixels_per_second-ZOOM_INCREMENT, MIN_ZOOM)
+	zoom_index -= 1
+	pixels_per_second = max(zoom_levels[0], zoom_levels[zoom_index])
 	
 	var old_scroll_percent = (get_parent().scroll_vertical + get_parent().rect_size.y) / rect_size.y
 	var new_length = update_chart_length(song_length)
@@ -568,9 +568,10 @@ func _on_ZoomMinus_pressed():
 
 
 func _on_ZoomPlus_pressed():
-	if pixels_per_second >= MAX_ZOOM :
+	if zoom_index + 1 >= len(zoom_levels):
 		return
-	pixels_per_second = min(pixels_per_second+ZOOM_INCREMENT, MAX_ZOOM)
+	zoom_index += 1
+	pixels_per_second = min(zoom_levels[len(zoom_levels)-1], zoom_levels[zoom_index])
 	
 	var old_scroll_percent = (get_parent().scroll_vertical + get_parent().rect_size.y) / rect_size.y
 	var new_length = update_chart_length(song_length)
