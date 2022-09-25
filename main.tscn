@@ -683,7 +683,7 @@ margin_bottom = 22.0
 text = "v0.1"
 align = 2
 
-[node name="SongAudioPlayer" type="AudioStreamPlayer" parent="."]
+[node name="SongAudioPlayer" type="Node" parent="."]
 script = ExtResource( 3 )
 
 [node name="OpenAudioDialog" type="FileDialog" parent="." groups=["popups"]]
@@ -702,8 +702,6 @@ mode = 0
 access = 2
 filters = PoolStringArray( "*.wav ; WAV files", "*.ogg ; Ogg Vorbis Files", "*.mp3 ; MP3 Files" )
 show_hidden_files = true
-current_dir = "/Users/wangc/Documents/rhyzinus-charter"
-current_path = "/Users/wangc/Documents/rhyzinus-charter/"
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -734,8 +732,6 @@ mode = 0
 access = 2
 filters = PoolStringArray( "*.osu ; osu!mania beatmaps", "*.rznx ; Compressed Rhyzinus charts" )
 show_hidden_files = true
-current_dir = "/Users/wangc/Documents/rhyzinus-charter"
-current_path = "/Users/wangc/Documents/rhyzinus-charter/"
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -752,8 +748,6 @@ margin_bottom = 181.0
 access = 2
 filters = PoolStringArray( "*.rznx ; Compressed Rhyzinus charts" )
 show_hidden_files = true
-current_dir = "/Users/wangc/Documents/rhyzinus-charter"
-current_path = "/Users/wangc/Documents/rhyzinus-charter/"
 
 [node name="OpenFileDialog" type="FileDialog" parent="." groups=["popups"]]
 anchor_left = 0.5
@@ -771,8 +765,6 @@ mode = 0
 access = 2
 filters = PoolStringArray( "*.rzn ; Rhyzinus chart files" )
 show_hidden_files = true
-current_dir = "/Users/wangc/Documents/rhyzinus-charter"
-current_path = "/Users/wangc/Documents/rhyzinus-charter/"
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -789,8 +781,6 @@ margin_bottom = 181.0
 access = 2
 filters = PoolStringArray( "*.rzn ; Rhyzinus chart files" )
 show_hidden_files = true
-current_dir = "/Users/wangc/Documents/rhyzinus-charter"
-current_path = "/Users/wangc/Documents/rhyzinus-charter/"
 
 [node name="UnsavedPrompt" parent="." instance=ExtResource( 21 )]
 
