@@ -614,6 +614,7 @@ script = ExtResource( 17 )
 margin_left = 889.0
 margin_right = 970.0
 margin_bottom = 20.0
+focus_mode = 0
 text = "Play/Pause"
 
 [node name="Setup" type="MarginContainer" parent="PanelContainer/VBoxContainer/TabContainer"]
@@ -805,16 +806,30 @@ show_hidden_files = true
 script = ExtResource( 14 )
 
 [node name="Loadscreen" type="PanelContainer" parent="."]
-visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource( 15 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
+
+[node name="MarginContainer" type="MarginContainer" parent="Loadscreen"]
+margin_left = 7.0
+margin_top = 7.0
+margin_right = 1017.0
+margin_bottom = 593.0
+custom_constants/margin_right = 8
+custom_constants/margin_top = 8
+custom_constants/margin_left = 8
+custom_constants/margin_bottom = 8
+
+[node name="Label" type="Label" parent="Loadscreen/MarginContainer"]
+margin_left = 8.0
+margin_top = 8.0
+margin_right = 1002.0
+margin_bottom = 32.0
+size_flags_vertical = 0
+custom_fonts/font = ExtResource( 13 )
+text = "Loading..."
 
 [node name="ReselectAudioDialog" type="ConfirmationDialog" parent="."]
-visible = true
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
