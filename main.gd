@@ -100,7 +100,7 @@ func _on_PlaySpeedOption_item_selected(index):
 	var speed_options = [0.25, 0.5, 0.75, 1.0]
 	$SongAudioPlayer.set_playback_speed(speed_options[index])
 	
-func load_audio(path: String):
+func load_audio(path: String) -> int:
 	var line_edit = find_node("AudioPathLineEdit")
 	line_edit.text = path
 	
@@ -123,6 +123,7 @@ func load_audio(path: String):
 	$Loadscreen.visible = false
 	var audio_status_label = find_node("AudioSelectStatusLabel")
 	audio_status_label.report_status(err)
+	return err
 	
 func new_project():
 	$SongAudioPlayer.unload_audio()
@@ -243,6 +244,12 @@ func open_rzn(path):
 	if typeof(result.result) != TYPE_DICTIONARY:
 		push_error("chart data was not parsed as Dictionary")
 		return
-	load_audio(result.result.audio_path)
+	err = yield(load_audio(result.result.audio_path), "completed")
 	chart_node.load_chart_data(result.result)
 	saved_path = path
+	if err != OK:
+		$ReselectAudioDialog.popup_centered()
+
+
+func _on_ReselectAudioDialog_confirmed():
+	$OpenAudioDialog.popup_centered()

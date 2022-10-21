@@ -813,6 +813,21 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="ReselectAudioDialog" type="ConfirmationDialog" parent="."]
+visible = true
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -172.0
+margin_top = -63.0
+margin_right = 172.0
+margin_bottom = 63.0
+dialog_text = "The chart's audio file path was not found, or could not be loaded. 
+
+Would you like to re-select the audio file?"
+dialog_autowrap = true
+
 [connection signal="item_pressed" from="PanelContainer/VBoxContainer/Toolbar/DropdownFileMenu" to="." method="_on_DropdownFileMenu_item_pressed"]
 [connection signal="tab_changed" from="PanelContainer/VBoxContainer/TabContainer" to="." method="_on_TabContainer_tab_changed"]
 [connection signal="item_selected" from="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer/SubdivisionOption" to="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer/SubdivisionOption" method="_on_SubdivisionOption_item_selected"]
@@ -853,3 +868,4 @@ __meta__ = {
 [connection signal="file_selected" from="ExportFileDialog" to="." method="_on_ExportFileDialog_file_selected"]
 [connection signal="file_selected" from="OpenFileDialog" to="." method="_on_OpenFileDialog_file_selected"]
 [connection signal="file_selected" from="SaveFileDialog" to="." method="_on_SaveFileDialog_file_selected"]
+[connection signal="confirmed" from="ReselectAudioDialog" to="." method="_on_ReselectAudioDialog_confirmed"]

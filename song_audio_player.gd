@@ -114,7 +114,11 @@ func update_song_position():
 func play_from_position(from_position: float):
 	if custom_stream != null:
 		seek(from_position)
-		song_position = from_position
+		if custom_stream.is_at_stream_end():
+			seek(0)
+			song_position = 0
+		else:
+			song_position = from_position
 		var err = custom_stream.start()
 		if err != OK:
 			print(err)
