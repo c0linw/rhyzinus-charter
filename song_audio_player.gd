@@ -29,6 +29,7 @@ signal audio_loaded(new_length)
 func _ready():
 	Shinobu.initialize()
 	pitch_shift = Shinobu.instantiate_pitch_shift()
+	pitch_shift.connect_to_endpoint()
 	
 	chart_node = get_tree().get_nodes_in_group("chart")[0]
 	
@@ -51,6 +52,7 @@ func _ready():
 	
 	sfx_group = Shinobu.create_group("sfx_group", null)
 	music_group = Shinobu.create_group("music", null)
+	music_group.connect_to_effect(pitch_shift)
 
 func load_audio(path: String) -> int:
 	# shinobu audio will literally try to load any file, so at least check the filetype (maybe try header check when i have more time)

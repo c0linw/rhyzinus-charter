@@ -166,6 +166,10 @@ func _input(event):
 					perform_toolbar_action(actions.IMPORT)
 				KEY_E:
 					perform_toolbar_action(actions.EXPORT)
+		if $PanelContainer/VBoxContainer/TabContainer.current_tab == 0:
+			match event.scancode:
+				KEY_SPACE:
+					_on_PlayButton_pressed()
 					
 func perform_toolbar_action(action: int):
 	for node in get_tree().get_nodes_in_group("popups"):

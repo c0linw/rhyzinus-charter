@@ -9,7 +9,7 @@ var note_type_to_sfx_enum: Dictionary = {
 	"": SFX_NONE, 
 	"tap": SFX_CLICK, 
 	"hold_start": SFX_CLICK, 
-	"hold_end": SFX_CLICK, 
+	"hold_end": SFX_NONE, 
 	"swipe": SFX_SWIPE
 }
 
