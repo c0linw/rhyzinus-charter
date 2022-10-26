@@ -18,9 +18,5 @@ func _on_Chart_anchor_scroll(percentage, new_size):
 	update()
 
 
-func _on_PlaybackSliderDisplay_playback_scrub(percentage):
-	pass # Replace with function body.
-
-
 func _on_SongAudioPlayer_song_position_updated(new_position, max_position):
 	scroll_vertical = (1 - new_position/max_position) * $Chart.rect_size.y - rect_size.y

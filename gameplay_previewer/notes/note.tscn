@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://gameplay_previewer/notes/note.gd" type="Script" id=1]
+
+[node name="Note" type="Spatial"]
+script = ExtResource( 1 )

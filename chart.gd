@@ -36,6 +36,7 @@ var ObjTimingPoint = preload("res://timing_point.tscn")
 
 signal anchor_scroll(percentage, new_size)
 signal custom_scroll(dir_multiplier) # up is 1, down is -1
+signal reprocess_preview(chart_node, reprocess_timing)
 
 enum BeatType {MEASURE, BEAT, SUBDIVISION}
 
@@ -670,6 +671,7 @@ func load_chart_data(chart_data: Dictionary):
 		add_timingpoint(timingpoint_data)
 	EditorStatus.set_saved()
 	EditorStatus.set_status("Ready")
+	emit_signal("reprocess_preview", self, true)
 
 func reset_chart_data():
 	for note in notes:

@@ -1,0 +1,54 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://gameplay_previewer/chart_data_processor.gd" type="Script" id=1]
+[ext_resource path="res://gameplay_previewer/entities/lanes_upper.tscn" type="PackedScene" id=3]
+[ext_resource path="res://gameplay_previewer/entities/lanes_lower.tscn" type="PackedScene" id=5]
+[ext_resource path="res://gameplay_previewer/textures/gameplay-bg.jpg" type="Texture" id=7]
+[ext_resource path="res://gameplay_previewer/game.gd" type="Script" id=11]
+
+[sub_resource type="Environment" id=1]
+background_mode = 4
+ambient_light_color = Color( 1, 1, 1, 1 )
+glow_intensity = 0.6
+glow_blend_mode = 0
+
+[node name="Game" type="Spatial"]
+script = ExtResource( 11 )
+
+[node name="Camera" type="Camera" parent="."]
+transform = Transform( 1, 0, 0, 0, 0.956305, 0.292372, 0, -0.292372, 0.956305, 0, 3.3, 5.5 )
+keep_aspect = 0
+current = true
+fov = 75.0
+
+[node name="Lanes_lower" parent="." instance=ExtResource( 5 )]
+
+[node name="Lanes_upper" parent="." instance=ExtResource( 3 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 2, -0.25 )
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource( 1 )
+
+[node name="Control" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Gameplay_bg" type="TextureRect" parent="Control"]
+self_modulate = Color( 0.188235, 0.188235, 0.188235, 1 )
+show_behind_parent = true
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+texture = ExtResource( 7 )
+expand = true
+stretch_mode = 7
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="chart_data_processor" type="Node" parent="."]
+script = ExtResource( 1 )

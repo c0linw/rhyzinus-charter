@@ -1,0 +1,100 @@
+[gd_scene load_steps=4 format=2]
+
+[sub_resource type="SpatialMaterial" id=1]
+
+[sub_resource type="CubeMesh" id=2]
+material = SubResource( 1 )
+size = Vector3( 0.05, 0.05, 1 )
+
+[sub_resource type="SpatialMaterial" id=3]
+
+[node name="Lanes_lower" type="Spatial"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 0 )
+
+[node name="MeshInstance" type="MeshInstance" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 24, 0, 0, -12 )
+mesh = SubResource( 2 )
+material/0 = null
+
+[node name="MeshInstance2" type="MeshInstance" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 24, 1, 0, -12 )
+mesh = SubResource( 2 )
+material/0 = null
+
+[node name="MeshInstance3" type="MeshInstance" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 24, 2, 0, -12 )
+mesh = SubResource( 2 )
+material/0 = null
+
+[node name="MeshInstance4" type="MeshInstance" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 24, 3, 0, -12 )
+mesh = SubResource( 2 )
+material/0 = null
+
+[node name="MeshInstance5" type="MeshInstance" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 24, 4, 0, -12 )
+mesh = SubResource( 2 )
+material/0 = null
+
+[node name="MeshInstance6" type="MeshInstance" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 24, 5, 0, -12 )
+mesh = SubResource( 2 )
+material/0 = null
+
+[node name="MeshInstance7" type="MeshInstance" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 24, 6, 0, -12 )
+mesh = SubResource( 2 )
+material/0 = null
+
+[node name="Judgement" type="MeshInstance" parent="."]
+transform = Transform( -4.37114e-08, 0, 16, 0, 1, 0, -1, 0, -6.99382e-07, 3, 0, 0 )
+mesh = SubResource( 2 )
+material/0 = null
+
+[node name="End" type="MeshInstance" parent="."]
+transform = Transform( -4.37114e-08, 0, 6.05, 0, 1, 0, -1, 0, -2.64454e-07, 3, 0, -24 )
+mesh = SubResource( 2 )
+material/0 = null
+
+[node name="Left" type="Spatial" parent="."]
+transform = Transform( 0.173648, 0.984808, 0, -0.984808, 0.173648, 0, 0, 0, 1, 0, 0, 0 )
+
+[node name="MeshInstance8" type="MeshInstance" parent="Left"]
+transform = Transform( -1.04308e-07, -1, 0, 1, -1.04308e-07, 0, 0, 0, 24, -1.25, -2.38419e-07, -12 )
+mesh = SubResource( 2 )
+skeleton = NodePath("../..")
+material/0 = null
+
+[node name="Judgement_left" type="MeshInstance" parent="Left"]
+transform = Transform( -1.04308e-07, 4.37114e-08, 1.3, 1, 5.32907e-15, 1.04308e-07, -8.35187e-23, 1, -5.68248e-08, -0.625, 0, 0 )
+mesh = SubResource( 2 )
+skeleton = NodePath("../..")
+material/0 = null
+
+[node name="End_left" type="MeshInstance" parent="Left"]
+transform = Transform( -1.04308e-07, 4.37114e-08, 1.3, 1, 5.32907e-15, 1.04308e-07, -8.35187e-23, 1, -5.68248e-08, -0.625, 0, -24 )
+material_override = SubResource( 3 )
+mesh = SubResource( 2 )
+skeleton = NodePath("../..")
+material/0 = null
+
+[node name="Right" type="Spatial" parent="."]
+transform = Transform( 0.173648, -0.984808, 0, 0.984808, 0.173648, 0, 0, 0, 1, 6, 0, 0 )
+
+[node name="MeshInstance9" type="MeshInstance" parent="Right"]
+transform = Transform( -8.9407e-08, 1, 0, -1, -8.9407e-08, 0, 0, 0, 24, 1.25, 0, -12 )
+mesh = SubResource( 2 )
+skeleton = NodePath("../..")
+material/0 = null
+
+[node name="Judgement_right" type="MeshInstance" parent="Right"]
+transform = Transform( -8.9407e-08, -4.37114e-08, -1.3, -1, 5.32907e-15, 1.3411e-07, -8.35187e-23, 1, -5.68248e-08, 0.625, 0, 0 )
+mesh = SubResource( 2 )
+skeleton = NodePath("../..")
+material/0 = null
+
+[node name="End_right" type="MeshInstance" parent="Right"]
+transform = Transform( -8.9407e-08, -4.37114e-08, -1.3, -1, 5.32907e-15, 1.3411e-07, -8.35187e-23, 1, -5.68248e-08, 0.625, 0, -24 )
+mesh = SubResource( 2 )
+skeleton = NodePath("../..")
+material/0 = null

@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=2]
+[gd_scene load_steps=34 format=2]
 
 [ext_resource path="res://chart.gd" type="Script" id=1]
 [ext_resource path="res://chart_view.gd" type="Script" id=2]
@@ -21,6 +21,7 @@
 [ext_resource path="res://audio_select_status_label.gd" type="Script" id=19]
 [ext_resource path="res://status_label.gd" type="Script" id=20]
 [ext_resource path="res://unsaved_prompt.tscn" type="PackedScene" id=21]
+[ext_resource path="res://gameplay_previewer/game_preview.tscn" type="PackedScene" id=22]
 
 [sub_resource type="StyleBoxFlat" id=2]
 resource_local_to_scene = true
@@ -682,6 +683,104 @@ margin_right = 986.0
 margin_bottom = 90.0
 custom_constants/separation = 16
 
+[node name="Preview" type="VBoxContainer" parent="PanelContainer/VBoxContainer/TabContainer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 32.0
+margin_right = -4.0
+margin_bottom = -4.0
+
+[node name="PanelContainer" type="PanelContainer" parent="PanelContainer/VBoxContainer/TabContainer/Preview"]
+margin_right = 1002.0
+margin_bottom = 464.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ViewportContainer" type="ViewportContainer" parent="PanelContainer/VBoxContainer/TabContainer/Preview/PanelContainer"]
+margin_left = 7.0
+margin_top = 7.0
+margin_right = 995.0
+margin_bottom = 457.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+stretch = true
+
+[node name="Viewport" type="Viewport" parent="PanelContainer/VBoxContainer/TabContainer/Preview/PanelContainer/ViewportContainer"]
+size = Vector2( 988, 450 )
+handle_input_locally = false
+render_target_update_mode = 0
+gui_disable_input = true
+
+[node name="Game" parent="PanelContainer/VBoxContainer/TabContainer/Preview/PanelContainer/ViewportContainer/Viewport" instance=ExtResource( 22 )]
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/VBoxContainer/TabContainer/Preview"]
+margin_top = 468.0
+margin_right = 1002.0
+margin_bottom = 500.0
+custom_constants/margin_right = 32
+custom_constants/margin_top = 8
+custom_constants/margin_left = 0
+custom_constants/margin_bottom = 4
+
+[node name="PreviewPlaybackHBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer/TabContainer/Preview/MarginContainer"]
+margin_top = 8.0
+margin_right = 970.0
+margin_bottom = 28.0
+alignment = 1
+
+[node name="PreviewPlaybackTimeLabel" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Preview/MarginContainer/PreviewPlaybackHBoxContainer"]
+margin_top = 3.0
+margin_right = 150.0
+margin_bottom = 17.0
+rect_min_size = Vector2( 150, 0 )
+text = "0:00.000 / 0:00.000"
+align = 2
+clip_text = true
+script = ExtResource( 18 )
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/VBoxContainer/TabContainer/Preview/MarginContainer/PreviewPlaybackHBoxContainer"]
+margin_left = 154.0
+margin_right = 885.0
+margin_bottom = 20.0
+size_flags_horizontal = 3
+custom_constants/margin_right = 8
+custom_constants/margin_left = 8
+
+[node name="PreviewPlaybackSliderInput" type="HSlider" parent="PanelContainer/VBoxContainer/TabContainer/Preview/MarginContainer/PreviewPlaybackHBoxContainer/MarginContainer"]
+modulate = Color( 1, 1, 1, 0 )
+margin_left = 8.0
+margin_top = 2.0
+margin_right = 723.0
+margin_bottom = 18.0
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 2000.0
+scrollable = false
+script = ExtResource( 16 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="PreviewPlaybackSliderDisplay" type="HSlider" parent="PanelContainer/VBoxContainer/TabContainer/Preview/MarginContainer/PreviewPlaybackHBoxContainer/MarginContainer"]
+margin_left = 8.0
+margin_top = 2.0
+margin_right = 723.0
+margin_bottom = 18.0
+mouse_filter = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 2000.0
+scrollable = false
+script = ExtResource( 17 )
+
+[node name="PreviewPlayButton" type="Button" parent="PanelContainer/VBoxContainer/TabContainer/Preview/MarginContainer/PreviewPlaybackHBoxContainer"]
+margin_left = 889.0
+margin_right = 970.0
+margin_bottom = 20.0
+text = "Play/Pause"
+
 [node name="StatusBar" type="MarginContainer" parent="PanelContainer/VBoxContainer"]
 margin_top = 564.0
 margin_right = 1010.0
@@ -806,6 +905,7 @@ show_hidden_files = true
 script = ExtResource( 14 )
 
 [node name="Loadscreen" type="PanelContainer" parent="."]
+visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource( 15 )
@@ -868,15 +968,21 @@ dialog_autowrap = true
 [connection signal="anchor_scroll" from="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer/ChartView/Chart" to="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer/ChartView" method="_on_Chart_anchor_scroll"]
 [connection signal="custom_scroll" from="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer/ChartView/Chart" to="SongAudioPlayer" method="_on_Chart_custom_scroll"]
 [connection signal="gui_input" from="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer/ChartView/Chart" to="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer/ChartView/Chart" method="_on_Chart_gui_input"]
+[connection signal="reprocess_preview" from="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer/ChartView/Chart" to="PanelContainer/VBoxContainer/TabContainer/Preview/PanelContainer/ViewportContainer/Viewport/Game" method="_on_Chart_reprocess_preview"]
 [connection signal="playhead_scrub" from="PanelContainer/VBoxContainer/TabContainer/Edit/MarginContainer/PlaybackHBoxContainer/MarginContainer/PlaybackSliderInput" to="SongAudioPlayer" method="_on_PlaybackSliderInput_playhead_scrub"]
 [connection signal="value_changed" from="PanelContainer/VBoxContainer/TabContainer/Edit/MarginContainer/PlaybackHBoxContainer/MarginContainer/PlaybackSliderInput" to="PanelContainer/VBoxContainer/TabContainer/Edit/MarginContainer/PlaybackHBoxContainer/MarginContainer/PlaybackSliderInput" method="_on_PlaybackSliderInput_value_changed"]
-[connection signal="playback_scrub" from="PanelContainer/VBoxContainer/TabContainer/Edit/MarginContainer/PlaybackHBoxContainer/MarginContainer/PlaybackSliderDisplay" to="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer/ChartView" method="_on_PlaybackSliderDisplay_playback_scrub"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/TabContainer/Edit/MarginContainer/PlaybackHBoxContainer/PlayButton" to="." method="_on_PlayButton_pressed"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/HBoxContainer/SelectAudioButton" to="." method="_on_SelectAudioButton_pressed"]
+[connection signal="playhead_scrub" from="PanelContainer/VBoxContainer/TabContainer/Preview/MarginContainer/PreviewPlaybackHBoxContainer/MarginContainer/PreviewPlaybackSliderInput" to="PanelContainer/VBoxContainer/TabContainer/Preview/PanelContainer/ViewportContainer/Viewport/Game" method="_on_PreviewPlaybackSliderInput_playhead_scrub"]
+[connection signal="playhead_scrub" from="PanelContainer/VBoxContainer/TabContainer/Preview/MarginContainer/PreviewPlaybackHBoxContainer/MarginContainer/PreviewPlaybackSliderInput" to="SongAudioPlayer" method="_on_PlaybackSliderInput_playhead_scrub"]
+[connection signal="value_changed" from="PanelContainer/VBoxContainer/TabContainer/Preview/MarginContainer/PreviewPlaybackHBoxContainer/MarginContainer/PreviewPlaybackSliderInput" to="PanelContainer/VBoxContainer/TabContainer/Preview/MarginContainer/PreviewPlaybackHBoxContainer/MarginContainer/PreviewPlaybackSliderInput" method="_on_PlaybackSliderInput_value_changed"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/TabContainer/Preview/MarginContainer/PreviewPlaybackHBoxContainer/PreviewPlayButton" to="." method="_on_PlayButton_pressed"]
 [connection signal="audio_loaded" from="SongAudioPlayer" to="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer/ChartView/Chart" method="_on_SongAudioPlayer_audio_loaded"]
 [connection signal="song_position_updated" from="SongAudioPlayer" to="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer/ChartView" method="_on_SongAudioPlayer_song_position_updated"]
 [connection signal="song_position_updated" from="SongAudioPlayer" to="PanelContainer/VBoxContainer/TabContainer/Edit/MarginContainer/PlaybackHBoxContainer/PlaybackTimeLabel" method="_on_SongAudioPlayer_song_position_updated"]
 [connection signal="song_position_updated" from="SongAudioPlayer" to="PanelContainer/VBoxContainer/TabContainer/Edit/MarginContainer/PlaybackHBoxContainer/MarginContainer/PlaybackSliderDisplay" method="_on_SongAudioPlayer_song_position_updated"]
+[connection signal="song_position_updated" from="SongAudioPlayer" to="PanelContainer/VBoxContainer/TabContainer/Preview/MarginContainer/PreviewPlaybackHBoxContainer/PreviewPlaybackTimeLabel" method="_on_SongAudioPlayer_song_position_updated"]
+[connection signal="song_position_updated" from="SongAudioPlayer" to="PanelContainer/VBoxContainer/TabContainer/Preview/MarginContainer/PreviewPlaybackHBoxContainer/MarginContainer/PreviewPlaybackSliderDisplay" method="_on_SongAudioPlayer_song_position_updated"]
 [connection signal="file_selected" from="OpenAudioDialog" to="." method="_on_OpenAudioDialog_file_selected"]
 [connection signal="set_bpm_point" from="BPMTimingPointDialog" to="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer/ChartView/Chart" method="_on_BPMTimingPointDialog_set_bpm_point"]
 [connection signal="file_selected" from="ImportFileDialog" to="." method="_on_ImportFileDialog_file_selected"]

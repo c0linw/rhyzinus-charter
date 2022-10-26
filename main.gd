@@ -16,6 +16,8 @@ func _ready():
 	
 	$PanelContainer/VBoxContainer/TabContainer.set_current_tab(1)
 	$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(0, true)
+	
+	find_node("Game").set_conductor_node($SongAudioPlayer)
 	EditorStatus.set_status("Ready")
 
 
@@ -147,8 +149,7 @@ func _notification(what):
 
 
 func _on_TabContainer_tab_changed(tab):
-	if tab != 0:
-		$SongAudioPlayer.pause()
+	$SongAudioPlayer.pause()
 		
 func _input(event):
 	if event is InputEventKey and event.pressed and !event.echo:

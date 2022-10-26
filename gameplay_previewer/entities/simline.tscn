@@ -1,0 +1,24 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://gameplay_previewer/entities/simline.gd" type="Script" id=1]
+[ext_resource path="res://gameplay_previewer/textures/simline.png" type="Texture" id=2]
+
+[sub_resource type="SpatialMaterial" id=2]
+flags_transparent = true
+albedo_color = Color( 1, 1, 1, 0.870588 )
+albedo_texture = ExtResource( 2 )
+uv1_scale = Vector3( 3, 2, 1 )
+distance_fade_mode = 1
+distance_fade_min_distance = 30.0
+distance_fade_max_distance = 20.0
+
+[sub_resource type="CubeMesh" id=1]
+size = Vector3( 1, 1, 1 )
+
+[node name="Simline" type="Spatial"]
+script = ExtResource( 1 )
+
+[node name="MeshInstance" type="MeshInstance" parent="."]
+transform = Transform( 0.02, 0, 0, 0, 1, 0, 0, 0, 0.02, 0, 0, 0 )
+material_override = SubResource( 2 )
+mesh = SubResource( 1 )

@@ -1,4 +1,10 @@
-extends HSlider
+extends Label
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = "text"
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -10,5 +16,5 @@ func _ready():
 #	pass
 
 
-func _on_SongAudioPlayer_song_position_updated(new_position, max_position):
-	value = max_value * new_position/max_position
+func _on_result_data_score_updated(score):
+	text = str(score)
