@@ -16,6 +16,7 @@ func _ready():
 	
 	$PanelContainer/VBoxContainer/TabContainer.set_current_tab(1)
 	$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(0, true)
+	$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(2, true)
 	
 	find_node("Game").set_conductor_node($SongAudioPlayer)
 	EditorStatus.set_status("Ready")
@@ -117,10 +118,12 @@ func load_audio(path: String) -> int:
 	if err != OK:
 		$PanelContainer/VBoxContainer/TabContainer.set_current_tab(1)
 		$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(0, true)
+		$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(2, true)
 	else: 
 		$SongAudioPlayer.emit_signal("song_position_updated", $SongAudioPlayer.song_position, $SongAudioPlayer.get_stream_length())
 		$PanelContainer/VBoxContainer/TabContainer.set_current_tab(tab_idx)
 		$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(0, false)
+		$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(2, false)
 	
 	$Loadscreen.visible = false
 	var audio_status_label = find_node("AudioSelectStatusLabel")
@@ -254,3 +257,12 @@ func open_rzn(path):
 
 func _on_ReselectAudioDialog_confirmed():
 	$OpenAudioDialog.popup_centered()
+
+
+func _on_PreviewPlaybackSliderInput_preview_playhead_scrub(percentage):
+	var game_preview = find_node("Game")
+	game_preview.set_process(false)
+	var playback_time = percentage * $SongAudioPlayer.get_stream_length()
+	game_preview.seek_to_playback_time(playback_time)
+	game_preview.set_process(true)
+	$SongAudioPlayer._on_PlaybackSliderInput_playhead_scrub(percentage)

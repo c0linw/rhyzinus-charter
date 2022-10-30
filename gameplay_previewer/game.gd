@@ -13,6 +13,7 @@ var audio_offset: float = 0.0
 var note_speed: float # speed range: 1.0 - 10.0
 var base_note_screen_time: float
 
+var chart_data # load chart into this variable, and copy its child arrays to the below arrays
 var notes_to_spawn: Array = []
 var scrollmod_list: Array = []
 var barlines_to_spawn: Array = []
@@ -85,6 +86,34 @@ signal note_judged(result)
 signal beat(measure, beat)
 signal pause
 
+class TimeSorter:
+	# denotes the order in which these should be sorted, if there are objects with the same time
+	const type_enum: Dictionary = {
+		"bpm": 0, 
+		"velocity": 1,
+		"barline": 2,
+		"tap": 3,
+		"swipe": 3,
+		"hold_start": 3,
+		"hold_end": 3,
+		"hold": 3
+	}
+	
+	static func sort_time_ascending(a: Dictionary, b: Dictionary) -> bool:
+		return a["time"] < b["time"]
+		
+	# use this after adding the timing points and notes into one array
+	static func sort_time_ascending_with_type_priority(a: Dictionary, b: Dictionary) -> bool:
+		if a["time"] < b["time"]:
+			return true
+		elif a["time"] == b["time"]:
+			return type_enum[a["type"]] < type_enum[b["type"]]
+		else:
+			return false
+			
+	static func sort_chart_position_ascending(a: Dictionary, b: Dictionary) -> bool:
+		return a["position"] < b["position"]
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	var bg_dim_setting = 3
@@ -112,7 +141,7 @@ func set_conductor_node(conductor_node: Node):
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
-	if conductor == null:
+	if conductor == null or not conductor.is_playing():
 		return
 	var timestamp = conductor.song_position
 	for sv in scrollmod_list:
@@ -343,8 +372,6 @@ func setup_judgement_textures():
 
 
 func draw_judgement(data: Dictionary, lane: int):
-	if input_zones[lane] == null:
-		return
 	var judgement = ObjJudgementTexture.instance()
 	var tex: ImageTexture
 	
@@ -353,21 +380,15 @@ func draw_judgement(data: Dictionary, lane: int):
 		FLAWLESS: 
 			tex = judgement_textures[FLAWLESS]
 			play_effect = true
-		DECRYPTED:
-			tex = judgement_textures[DECRYPTED]
-			play_effect = true
-		CRACKED:
-			tex = judgement_textures[CRACKED]
-			play_effect = true
-		CORRUPTED:
-			tex = judgement_textures[CORRUPTED]
+		_:
+			return
 	judgement.setup(tex, lower_lane_width)
 	judgement.position = Vector2(input_zones[lane].center.x - lower_lane_width/2, input_zones[lane].center.y - lower_lane_width/2)
 	$CanvasLayer.add_child(judgement)
 	
 	if play_effect:
 		play_effect(lane)
-		
+	
 
 func play_effect(lane: int):
 	var fx = ObjNoteEffect.instance()
@@ -385,10 +406,6 @@ func delete_note(note: Note3D):
 	note.queue_free()
 
 
-func _on_PreviewPlaybackSliderInput_playhead_scrub(percentage):
-	print("seek to new playback time")
-
-
 func _on_Chart_reprocess_preview(chart_node, reprocess_timing):
 	if reprocess_timing:
 		reprocess_all(chart_node)
@@ -397,17 +414,63 @@ func _on_Chart_reprocess_preview(chart_node, reprocess_timing):
 
 # reset onscreen_notes and notes_to_spawn, etc. when seeking to new audio positon
 func seek_to_playback_time(timestamp: float):
-	pass
+	for barline in onscreen_barlines:
+		barline.queue_free()
+	onscreen_barlines = []
+	
+	for simline in onscreen_simlines:
+		simline.queue_free()
+	onscreen_simlines = []
+	
+	for note in onscreen_notes:
+		note.queue_free()
+	onscreen_notes = []
+	
+	notes_to_spawn = chart_data.notes.duplicate()
+	scrollmod_list = chart_data.timing_points.duplicate()
+	barlines_to_spawn = chart_data.barlines.duplicate()
+	beat_data = chart_data.beats.duplicate()
+	simlines_to_spawn = chart_data.simlines.duplicate()
+	
+	# use scrollmods to calculate current chart position
+	last_timestamp = 0.0
+	sv_velocity = 1.0
+	chart_position = 0.0
+	for sv in scrollmod_list.duplicate():
+		if timestamp >= sv["time"]:
+			apply_timing_point(sv)
+		else:
+			break
+	chart_position += (timestamp - last_timestamp) * sv_velocity
+	
+	# remove everything with timestamp before current chart position, and spawn anything that is within screen visible time
+	# if chart_position >= barline_data["position"] - base_note_screen_time:)
+	notes_to_spawn = truncate_values_before_position(notes_to_spawn, chart_position)
+	barlines_to_spawn = truncate_values_before_position(barlines_to_spawn, chart_position)
+	beat_data = truncate_values_before_time(beat_data, timestamp)
+	simlines_to_spawn = truncate_values_before_position(simlines_to_spawn, chart_position)
+	
+	last_timestamp = timestamp
+	
+func truncate_values_before_position(values: Array, chart_position: float) -> Array:
+	var dummy := {"position": chart_position} # bsearch_custom needs a dictonary as input to make the comparisons work
+	var i: int = values.bsearch_custom(dummy, TimeSorter, "sort_chart_position_ascending", false)
+	return values.slice(i, len(values)-1)
+	
+func truncate_values_before_time(values: Array, timestamp: float) -> Array:
+	var dummy := {"time": timestamp} # bsearch_custom needs a dictonary as input to make the comparisons work
+	var i: int = values.bsearch_custom(dummy, TimeSorter, "sort_time_ascending", false)
+	return values.slice(i, len(values)-1)
 
 # reprocess all entities (use if timing points have changed)
 func reprocess_all(chart_node: Node):
-	var chart_data = $chart_data_processor.export_data(chart_node.get_chart_data())
-	#notes_to_spawn = chart_data["notes"].duplicate()
-	#scrollmod_list = chart_data["timing_points"].duplicate()
-	#barlines_to_spawn = chart_data["barlines"].duplicate()
-	#beat_data = chart_data["beats"].duplicate()
-	#notecount = chart_data["notecount"]
-	#simlines_to_spawn = chart_data["simlines"].duplicate()
+	chart_data = $chart_data_processor.export_data(chart_node.get_chart_data())
+	notes_to_spawn = chart_data.notes.duplicate()
+	scrollmod_list = chart_data.timing_points.duplicate()
+	barlines_to_spawn = chart_data.barlines.duplicate()
+	beat_data = chart_data.beats.duplicate()
+	notecount = chart_data.notecount
+	simlines_to_spawn = chart_data.simlines.duplicate()
 
 # reprocess notes, assuming timing points haven't changed
 func reprocess_notes(chart_node: Node):

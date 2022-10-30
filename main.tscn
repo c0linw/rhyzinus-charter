@@ -797,7 +797,7 @@ script = ExtResource( 20 )
 margin_top = 8.0
 margin_right = 1010.0
 margin_bottom = 22.0
-text = "v0.2"
+text = "v1.0.0"
 align = 2
 
 [node name="SongAudioPlayer" type="Node" parent="."]
@@ -973,9 +973,9 @@ dialog_autowrap = true
 [connection signal="value_changed" from="PanelContainer/VBoxContainer/TabContainer/Edit/MarginContainer/PlaybackHBoxContainer/MarginContainer/PlaybackSliderInput" to="PanelContainer/VBoxContainer/TabContainer/Edit/MarginContainer/PlaybackHBoxContainer/MarginContainer/PlaybackSliderInput" method="_on_PlaybackSliderInput_value_changed"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/TabContainer/Edit/MarginContainer/PlaybackHBoxContainer/PlayButton" to="." method="_on_PlayButton_pressed"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/HBoxContainer/SelectAudioButton" to="." method="_on_SelectAudioButton_pressed"]
-[connection signal="playhead_scrub" from="PanelContainer/VBoxContainer/TabContainer/Preview/MarginContainer/PreviewPlaybackHBoxContainer/MarginContainer/PreviewPlaybackSliderInput" to="PanelContainer/VBoxContainer/TabContainer/Preview/PanelContainer/ViewportContainer/Viewport/Game" method="_on_PreviewPlaybackSliderInput_playhead_scrub"]
-[connection signal="playhead_scrub" from="PanelContainer/VBoxContainer/TabContainer/Preview/MarginContainer/PreviewPlaybackHBoxContainer/MarginContainer/PreviewPlaybackSliderInput" to="SongAudioPlayer" method="_on_PlaybackSliderInput_playhead_scrub"]
+[connection signal="preview_playhead_scrub" from="PanelContainer/VBoxContainer/TabContainer/Preview/MarginContainer/PreviewPlaybackHBoxContainer/MarginContainer/PreviewPlaybackSliderInput" to="." method="_on_PreviewPlaybackSliderInput_preview_playhead_scrub"]
 [connection signal="value_changed" from="PanelContainer/VBoxContainer/TabContainer/Preview/MarginContainer/PreviewPlaybackHBoxContainer/MarginContainer/PreviewPlaybackSliderInput" to="PanelContainer/VBoxContainer/TabContainer/Preview/MarginContainer/PreviewPlaybackHBoxContainer/MarginContainer/PreviewPlaybackSliderInput" method="_on_PlaybackSliderInput_value_changed"]
+[connection signal="value_changed" from="PanelContainer/VBoxContainer/TabContainer/Preview/MarginContainer/PreviewPlaybackHBoxContainer/MarginContainer/PreviewPlaybackSliderInput" to="PanelContainer/VBoxContainer/TabContainer/Preview/MarginContainer/PreviewPlaybackHBoxContainer/MarginContainer/PreviewPlaybackSliderInput" method="_on_PreviewPlaybackSliderInput_value_changed"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/TabContainer/Preview/MarginContainer/PreviewPlaybackHBoxContainer/PreviewPlayButton" to="." method="_on_PlayButton_pressed"]
 [connection signal="audio_loaded" from="SongAudioPlayer" to="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer/ChartView/Chart" method="_on_SongAudioPlayer_audio_loaded"]
 [connection signal="song_position_updated" from="SongAudioPlayer" to="PanelContainer/VBoxContainer/TabContainer/Edit/EditorHBoxContainer/PanelContainer/VBoxContainer/ChartView" method="_on_SongAudioPlayer_song_position_updated"]
