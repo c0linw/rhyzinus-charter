@@ -141,7 +141,7 @@ func set_conductor_node(conductor_node: Node):
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
-	if conductor == null:
+	if conductor == null or not conductor.is_playing():
 		return
 	var timestamp = conductor.song_position
 	for sv in scrollmod_list:
@@ -152,32 +152,7 @@ func _process(_delta):
 	
 	chart_position += (timestamp - last_timestamp) * sv_velocity
 	
-	var spawnable_barlines: Array
-	for barline_data in barlines_to_spawn:
-		if chart_position >= barline_data["position"] - base_note_screen_time:
-			spawnable_barlines.append(barline_data)
-		else:
-			break # assumes all barlines are stored in ascending time
-	for barline_data in spawnable_barlines:
-		spawn_barline(barline_data)
-	
-	var spawnable_notes: Array
-	for note_data in notes_to_spawn:
-		if chart_position >= note_data["position"] - base_note_screen_time:
-			spawnable_notes.append(note_data)
-		else:
-			break # assumes all notes are stored in ascending time
-	for note_data in spawnable_notes:
-		spawn_note(note_data)
-			
-	var spawnable_simlines: Array
-	for simline_data in simlines_to_spawn:
-		if chart_position >= simline_data["position"] - base_note_screen_time:
-			spawnable_simlines.append(simline_data)
-		else:
-			break # assumes all simlines are stored in ascending time
-	for simline_data in spawnable_simlines:
-		spawn_simline(simline_data)
+	spawn_entities(chart_position)
 			
 	var barlines_to_delete: Array
 	for barline in onscreen_barlines:
@@ -270,6 +245,34 @@ func _process(_delta):
 		beat_data.erase(beat)
 
 	last_timestamp = timestamp
+	
+func spawn_entities(chart_position: float): 
+	var spawnable_barlines: Array
+	for barline_data in barlines_to_spawn:
+		if chart_position >= barline_data["position"] - base_note_screen_time:
+			spawnable_barlines.append(barline_data)
+		else:
+			break # assumes all barlines are stored in ascending time
+	for barline_data in spawnable_barlines:
+		spawn_barline(barline_data)
+	
+	var spawnable_notes: Array
+	for note_data in notes_to_spawn:
+		if chart_position >= note_data["position"] - base_note_screen_time:
+			spawnable_notes.append(note_data)
+		else:
+			break # assumes all notes are stored in ascending time
+	for note_data in spawnable_notes:
+		spawn_note(note_data)
+			
+	var spawnable_simlines: Array
+	for simline_data in simlines_to_spawn:
+		if chart_position >= simline_data["position"] - base_note_screen_time:
+			spawnable_simlines.append(simline_data)
+		else:
+			break # assumes all simlines are stored in ascending time
+	for simline_data in spawnable_simlines:
+		spawn_simline(simline_data)
 
 func apply_timing_point(sv: Dictionary):
 	# account for any bit of the old scrollmod that was missed
@@ -446,6 +449,14 @@ func seek_to_playback_time(timestamp: float):
 	barlines_to_spawn = truncate_values_before_position(barlines_to_spawn, chart_position)
 	beat_data = truncate_values_before_time(beat_data, timestamp)
 	simlines_to_spawn = truncate_values_before_position(simlines_to_spawn, chart_position)
+	
+	spawn_entities(chart_position)
+	for note in onscreen_notes:
+		note.render(chart_position, lane_depth, base_note_screen_time)
+	for simline in onscreen_simlines:
+		simline.render(chart_position, lane_depth, base_note_screen_time)
+	for barline in onscreen_barlines:
+		barline.render(chart_position, lane_depth, base_note_screen_time)
 	
 	last_timestamp = timestamp
 	
