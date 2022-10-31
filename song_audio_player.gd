@@ -1,5 +1,5 @@
 extends Node
-
+class_name AudioStreamPlayerShinobu
 
 const CUSTOM_STREAM_OFFSET = 0.05 # for some reason fire-and-forget sounds have a different latency from the instantiated sound
 

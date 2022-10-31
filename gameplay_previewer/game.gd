@@ -6,7 +6,7 @@ enum BeatType {MEASURE, BEAT, SUBDIVISION}
 
 # audio stuff
 var audio
-var conductor
+var conductor: AudioStreamPlayerShinobu
 
 # gameplay stuff
 var audio_offset: float = 0.0
@@ -141,7 +141,7 @@ func set_conductor_node(conductor_node: Node):
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):
-	if conductor == null or not conductor.is_playing():
+	if conductor == null:
 		return
 	var timestamp = conductor.song_position
 	for sv in scrollmod_list:
@@ -406,11 +406,8 @@ func delete_note(note: Note3D):
 	note.queue_free()
 
 
-func _on_Chart_reprocess_preview(chart_node, reprocess_timing):
-	if reprocess_timing:
-		reprocess_all(chart_node)
-	else:
-		reprocess_notes(chart_node)
+func _on_Chart_reload_preview(chart_node):
+	reload_chart(chart_node)
 
 # reset onscreen_notes and notes_to_spawn, etc. when seeking to new audio positon
 func seek_to_playback_time(timestamp: float):
@@ -462,8 +459,9 @@ func truncate_values_before_time(values: Array, timestamp: float) -> Array:
 	var i: int = values.bsearch_custom(dummy, TimeSorter, "sort_time_ascending", false)
 	return values.slice(i, len(values)-1)
 
-# reprocess all entities (use if timing points have changed)
-func reprocess_all(chart_node: Node):
+# reprocess all entities
+func reload_chart(chart_node: Node):
+	set_process(false)
 	chart_data = $chart_data_processor.export_data(chart_node.get_chart_data())
 	notes_to_spawn = chart_data.notes.duplicate()
 	scrollmod_list = chart_data.timing_points.duplicate()
@@ -471,7 +469,8 @@ func reprocess_all(chart_node: Node):
 	beat_data = chart_data.beats.duplicate()
 	notecount = chart_data.notecount
 	simlines_to_spawn = chart_data.simlines.duplicate()
+	
+	seek_to_playback_time(conductor.get_playback_position())
+	set_process(true)
+	
 
-# reprocess notes, assuming timing points haven't changed
-func reprocess_notes(chart_node: Node):
-	pass

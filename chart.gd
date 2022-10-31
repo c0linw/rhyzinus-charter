@@ -36,7 +36,7 @@ var ObjTimingPoint = preload("res://timing_point.tscn")
 
 signal anchor_scroll(percentage, new_size)
 signal custom_scroll(dir_multiplier) # up is 1, down is -1
-signal reprocess_preview(chart_node, reprocess_timing)
+signal reload_preview(chart_node)
 
 enum BeatType {MEASURE, BEAT, SUBDIVISION}
 
@@ -252,7 +252,7 @@ func _on_Chart_gui_input(event):
 							}
 						else:
 							return
-				add_timingpoint(new_timingpoint_data)
+				add_timingpoint_and_update(new_timingpoint_data)
 			else:
 				var snapped_lane: float = find_lane(event.position)
 				var new_note_data: Dictionary = {
@@ -260,7 +260,7 @@ func _on_Chart_gui_input(event):
 					"lane": snapped_lane,
 					"type": type
 				}
-				add_note(new_note_data)
+				add_note_and_update(new_note_data)
 		if event.button_index == BUTTON_RIGHT and event.pressed:
 			pass
 		if event.button_index == BUTTON_WHEEL_DOWN and event.pressed:
@@ -284,7 +284,20 @@ func _on_TimingPoint_gui_input(event, timingpoint):
 		if event.button_index == BUTTON_RIGHT and event.pressed:
 			delete_timingpoint(timingpoint)
 			
-func add_note(note_data: Dictionary):
+# adds a note, then performs processing to maintain sort order and hold ends before updating
+func add_note_and_update(note_data: Dictionary):
+	_add_note(note_data)
+	
+	notes.sort_custom(TimeSorter, "sort_notes_ascending")
+		
+	hold_pairs = find_hold_pairs(notes)
+	update_note_positions()
+	update()
+	emit_signal("reload_preview", self)
+	EditorStatus.set_modified()
+	
+# adds a note, but doesn't sort the notes or update note positions/holds
+func _add_note(note_data: Dictionary):
 	if note_data.lane < 0 or note_data.lane > 13 or (note_data.lane > 7 and note_data.lane < 10):
 		return
 	var latest_note_time = notes[len(notes)-1].time if len(notes) > 0 else 0
@@ -299,13 +312,6 @@ func add_note(note_data: Dictionary):
 	elif note_instance.lane >= 10 and note_instance.lane <= 13:
 		$Upper.add_child(note_instance)
 	note_instance.connect("custom_gui_input", self, "_on_Note_gui_input")
-	
-	notes.sort_custom(TimeSorter, "sort_notes_ascending")
-		
-	hold_pairs = find_hold_pairs(notes)
-	update_note_positions()
-	update()
-	EditorStatus.set_modified()
 		
 func delete_note(note):
 	print("deleting note with time %s, lane %s" % [note.time, note.lane])
@@ -314,6 +320,7 @@ func delete_note(note):
 	hold_pairs = find_hold_pairs(notes)
 	update_note_positions()
 	update()
+	emit_signal("reload_preview", self)
 	EditorStatus.set_modified()
 	
 # returns a note entity, or null
@@ -330,7 +337,17 @@ func find_note(time: float, lane: int):
 	return null
 	
 	
-func add_timingpoint(timingpoint_data: Dictionary):
+func add_timingpoint_and_update(timingpoint_data: Dictionary):
+	_add_timingpoint(timingpoint_data)
+		
+	beats = generate_beats(current_subdivision)
+	update_timingpoint_positions()
+	update_note_positions()
+	update()
+	emit_signal("reload_preview", self)
+	EditorStatus.set_modified()
+	
+func _add_timingpoint(timingpoint_data: Dictionary):
 	match timingpoint_data.type:
 		"bpm":
 			var timingpoint_instance: TimingPoint = ObjTimingPoint.instance()
@@ -358,12 +375,6 @@ func add_timingpoint(timingpoint_data: Dictionary):
 			velocity_changes.sort_custom(TimeSorter, "sort_ascending")
 		_:
 			return
-		
-	beats = generate_beats(current_subdivision)
-	update_timingpoint_positions()
-	update_note_positions()
-	update()
-	EditorStatus.set_modified()
 	
 func delete_timingpoint(timingpoint):
 	match timingpoint.type:
@@ -383,6 +394,7 @@ func delete_timingpoint(timingpoint):
 	update_timingpoint_positions()
 	update_note_positions()
 	update()
+	emit_signal("reload_preview", self)
 	EditorStatus.set_modified()
 	
 # returns a note entity, or null
@@ -662,16 +674,23 @@ func load_chart_data(chart_data: Dictionary):
 	bpm_changes = []
 	velocity_changes = []
 	
-	# TODO: optimize by not calling add_note and add_timingpoint repeatedly
 	for note_data in chart_data.notes:
-		add_note(note_data)
+		_add_note(note_data)
 	for timingpoint_data in chart_data.bpm_changes:
-		add_timingpoint(timingpoint_data)
+		_add_timingpoint(timingpoint_data)
 	for timingpoint_data in chart_data.velocity_changes:
-		add_timingpoint(timingpoint_data)
+		_add_timingpoint(timingpoint_data)
+
+	notes.sort_custom(TimeSorter, "sort_notes_ascending")
+	hold_pairs = find_hold_pairs(notes)
+	beats = generate_beats(current_subdivision)
+	update_timingpoint_positions()
+	update_note_positions()
+	update()
+	
+	emit_signal("reload_preview", self)
 	EditorStatus.set_saved()
 	EditorStatus.set_status("Ready")
-	emit_signal("reprocess_preview", self, true)
 
 func reset_chart_data():
 	for note in notes:
@@ -685,7 +704,7 @@ func reset_chart_data():
 	velocity_changes = []
 	hold_pairs = []
 	
-	add_timingpoint({
+	_add_timingpoint({
 		"time": 0,
 		"beat_length": 0.5,
 		"meter": 4,
