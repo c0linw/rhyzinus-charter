@@ -1,4 +1,4 @@
-[gd_scene load_steps=34 format=2]
+[gd_scene load_steps=35 format=2]
 
 [ext_resource path="res://chart.gd" type="Script" id=1]
 [ext_resource path="res://chart_view.gd" type="Script" id=2]
@@ -22,6 +22,7 @@
 [ext_resource path="res://status_label.gd" type="Script" id=20]
 [ext_resource path="res://unsaved_prompt.tscn" type="PackedScene" id=21]
 [ext_resource path="res://gameplay_previewer/game_preview.tscn" type="PackedScene" id=22]
+[ext_resource path="res://note_speed_spinbox.gd" type="Script" id=23]
 
 [sub_resource type="StyleBoxFlat" id=2]
 resource_local_to_scene = true
@@ -281,7 +282,7 @@ margin_bottom = 52.0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer"]
 margin_left = 307.0
-margin_right = 407.0
+margin_right = 415.0
 margin_bottom = 52.0
 
 [node name="PlaySpeedLabel" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer/HBoxContainer"]
@@ -293,21 +294,21 @@ text = "Speed: "
 [node name="PlaySpeedOption" type="OptionButton" parent="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer/HBoxContainer"]
 margin_left = 51.0
 margin_top = 16.0
-margin_right = 100.0
+margin_right = 108.0
 margin_bottom = 36.0
 size_flags_vertical = 4
-text = "1.0"
-items = [ "0.25", null, false, 0, null, "0.5", null, false, 1, null, "0.75", null, false, 2, null, "1.0", null, false, 3, null ]
+text = "1.00"
+items = [ "0.25", null, false, 0, null, "0.50", null, false, 1, null, "0.75", null, false, 2, null, "1.00", null, false, 3, null ]
 selected = 3
 
 [node name="VSeparator3" type="VSeparator" parent="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer"]
-margin_left = 411.0
-margin_right = 415.0
+margin_left = 419.0
+margin_right = 423.0
 margin_bottom = 52.0
 
 [node name="GridContainer" type="GridContainer" parent="PanelContainer/VBoxContainer/TabContainer/Edit/ToolbarHBoxContainer"]
-margin_left = 419.0
-margin_right = 543.0
+margin_left = 427.0
+margin_right = 551.0
 margin_bottom = 52.0
 columns = 2
 
@@ -692,7 +693,94 @@ margin_top = 32.0
 margin_right = -4.0
 margin_bottom = -4.0
 
+[node name="PreviewToolbarHBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer/TabContainer/Preview"]
+margin_right = 1002.0
+margin_bottom = 52.0
+
+[node name="NoteSpeedLabel" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Preview/PreviewToolbarHBoxContainer"]
+margin_top = 19.0
+margin_right = 82.0
+margin_bottom = 33.0
+text = "Note Speed: "
+
+[node name="NoteSpeedSpinbox" type="SpinBox" parent="PanelContainer/VBoxContainer/TabContainer/Preview/PreviewToolbarHBoxContainer"]
+margin_left = 86.0
+margin_top = 14.0
+margin_right = 160.0
+margin_bottom = 38.0
+size_flags_vertical = 4
+min_value = 1.0
+max_value = 10.0
+step = 0.5
+value = 7.0
+script = ExtResource( 23 )
+
+[node name="VSeparator" type="VSeparator" parent="PanelContainer/VBoxContainer/TabContainer/Preview/PreviewToolbarHBoxContainer"]
+margin_left = 164.0
+margin_right = 168.0
+margin_bottom = 52.0
+
+[node name="PlaySpeedLabel" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Preview/PreviewToolbarHBoxContainer"]
+margin_left = 172.0
+margin_top = 19.0
+margin_right = 278.0
+margin_bottom = 33.0
+text = "Playback Speed: "
+
+[node name="PreviewPlaySpeedOption" type="OptionButton" parent="PanelContainer/VBoxContainer/TabContainer/Preview/PreviewToolbarHBoxContainer"]
+margin_left = 282.0
+margin_top = 16.0
+margin_right = 331.0
+margin_bottom = 36.0
+size_flags_vertical = 4
+text = "1.00"
+items = [ "0.25", null, false, 0, null, "0.50", null, false, 1, null, "0.75", null, false, 2, null, "1.00", null, false, 3, null ]
+selected = 3
+
+[node name="VSeparator2" type="VSeparator" parent="PanelContainer/VBoxContainer/TabContainer/Preview/PreviewToolbarHBoxContainer"]
+margin_left = 335.0
+margin_right = 339.0
+margin_bottom = 52.0
+
+[node name="GridContainer" type="GridContainer" parent="PanelContainer/VBoxContainer/TabContainer/Preview/PreviewToolbarHBoxContainer"]
+margin_left = 343.0
+margin_right = 467.0
+margin_bottom = 52.0
+columns = 2
+
+[node name="MusicVolumeLabel" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Preview/PreviewToolbarHBoxContainer/GridContainer"]
+margin_top = 5.0
+margin_right = 46.0
+margin_bottom = 19.0
+text = "Music:"
+
+[node name="PreviewMusicVolumeSpinBox" type="SpinBox" parent="PanelContainer/VBoxContainer/TabContainer/Preview/PreviewToolbarHBoxContainer/GridContainer"]
+margin_left = 50.0
+margin_right = 124.0
+margin_bottom = 24.0
+step = 5.0
+value = 100.0
+rounded = true
+suffix = "%"
+
+[node name="SFXVolumeLabel" type="Label" parent="PanelContainer/VBoxContainer/TabContainer/Preview/PreviewToolbarHBoxContainer/GridContainer"]
+margin_top = 33.0
+margin_right = 46.0
+margin_bottom = 47.0
+text = "Effects:"
+
+[node name="PreviewSFXVolumeSpinBox" type="SpinBox" parent="PanelContainer/VBoxContainer/TabContainer/Preview/PreviewToolbarHBoxContainer/GridContainer"]
+margin_left = 50.0
+margin_top = 28.0
+margin_right = 124.0
+margin_bottom = 52.0
+step = 5.0
+value = 100.0
+rounded = true
+suffix = "%"
+
 [node name="PanelContainer" type="PanelContainer" parent="PanelContainer/VBoxContainer/TabContainer/Preview"]
+margin_top = 56.0
 margin_right = 1002.0
 margin_bottom = 464.0
 size_flags_horizontal = 3
@@ -702,13 +790,13 @@ size_flags_vertical = 3
 margin_left = 7.0
 margin_top = 7.0
 margin_right = 995.0
-margin_bottom = 457.0
+margin_bottom = 401.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 stretch = true
 
 [node name="Viewport" type="Viewport" parent="PanelContainer/VBoxContainer/TabContainer/Preview/PanelContainer/ViewportContainer"]
-size = Vector2( 988, 450 )
+size = Vector2( 988, 394 )
 handle_input_locally = false
 render_target_update_mode = 0
 gui_disable_input = true
@@ -973,6 +1061,10 @@ dialog_autowrap = true
 [connection signal="value_changed" from="PanelContainer/VBoxContainer/TabContainer/Edit/MarginContainer/PlaybackHBoxContainer/MarginContainer/PlaybackSliderInput" to="PanelContainer/VBoxContainer/TabContainer/Edit/MarginContainer/PlaybackHBoxContainer/MarginContainer/PlaybackSliderInput" method="_on_PlaybackSliderInput_value_changed"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/TabContainer/Edit/MarginContainer/PlaybackHBoxContainer/PlayButton" to="." method="_on_PlayButton_pressed"]
 [connection signal="pressed" from="PanelContainer/VBoxContainer/TabContainer/Setup/VBoxContainer/HBoxContainer/SelectAudioButton" to="." method="_on_SelectAudioButton_pressed"]
+[connection signal="value_changed" from="PanelContainer/VBoxContainer/TabContainer/Preview/PreviewToolbarHBoxContainer/NoteSpeedSpinbox" to="PanelContainer/VBoxContainer/TabContainer/Preview/PanelContainer/ViewportContainer/Viewport/Game" method="_on_NoteSpeedSpinbox_value_changed"]
+[connection signal="item_selected" from="PanelContainer/VBoxContainer/TabContainer/Preview/PreviewToolbarHBoxContainer/PreviewPlaySpeedOption" to="." method="_on_PlaySpeedOption_item_selected"]
+[connection signal="value_changed" from="PanelContainer/VBoxContainer/TabContainer/Preview/PreviewToolbarHBoxContainer/GridContainer/PreviewMusicVolumeSpinBox" to="." method="_on_VolumeSpinBox_value_changed"]
+[connection signal="value_changed" from="PanelContainer/VBoxContainer/TabContainer/Preview/PreviewToolbarHBoxContainer/GridContainer/PreviewSFXVolumeSpinBox" to="." method="_on_SFXVolumeSpinBox_value_changed"]
 [connection signal="preview_playhead_scrub" from="PanelContainer/VBoxContainer/TabContainer/Preview/MarginContainer/PreviewPlaybackHBoxContainer/MarginContainer/PreviewPlaybackSliderInput" to="." method="_on_PreviewPlaybackSliderInput_preview_playhead_scrub"]
 [connection signal="value_changed" from="PanelContainer/VBoxContainer/TabContainer/Preview/MarginContainer/PreviewPlaybackHBoxContainer/MarginContainer/PreviewPlaybackSliderInput" to="PanelContainer/VBoxContainer/TabContainer/Preview/MarginContainer/PreviewPlaybackHBoxContainer/MarginContainer/PreviewPlaybackSliderInput" method="_on_PlaybackSliderInput_value_changed"]
 [connection signal="value_changed" from="PanelContainer/VBoxContainer/TabContainer/Preview/MarginContainer/PreviewPlaybackHBoxContainer/MarginContainer/PreviewPlaybackSliderInput" to="PanelContainer/VBoxContainer/TabContainer/Preview/MarginContainer/PreviewPlaybackHBoxContainer/MarginContainer/PreviewPlaybackSliderInput" method="_on_PreviewPlaybackSliderInput_value_changed"]

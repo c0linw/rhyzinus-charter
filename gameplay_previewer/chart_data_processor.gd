@@ -196,7 +196,11 @@ func generate_barlines(data: Array) -> Array:
 	var beat: int = 0
 	
 	# use either the last note or the last timing point's time
-	var end_time: float = max(data[len(data)-1]["time"], notes[len(notes)-1]["time"])
+	var end_time: float
+	if len(notes) > 0:
+		end_time = max(data[len(data)-1]["time"], notes[len(notes)-1]["time"])
+	else:
+		end_time = data[len(data)-1]["time"]
 	while timestamp <= end_time:
 		if beat % meter == 0:
 			return_data.append({
@@ -233,7 +237,11 @@ func generate_beats(timing_points: Array):
 		})
 	
 	# use either the last note or the last timing point's time
-	var end_time: float = max(data[len(data)-1]["time"], notes[len(notes)-1]["time"])
+	var end_time: float
+	if len(notes) > 0:
+		end_time = max(data[len(data)-1]["time"], notes[len(notes)-1]["time"])
+	else:
+		end_time = data[len(data)-1]["time"]
 	while timestamp <= end_time:
 		if beat % meter == 0:
 			measure += 1

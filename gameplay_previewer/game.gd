@@ -124,7 +124,7 @@ func _ready():
 	lane_depth = 24.0
 	
 	######## SETUP OBJECTS
-	base_note_screen_time = (3 + (10-note_speed)) / note_speed 
+	base_note_screen_time = get_note_screen_time(7.0) # default value, may get overridden by NoteSpeedSpinbox
 	
 	#notes_to_spawn = chart_data["notes"].duplicate()
 	#scrollmod_list = chart_data["timing_points"].duplicate()
@@ -481,7 +481,13 @@ func reload_chart(chart_node: Node):
 	notecount = chart_data.notecount
 	simlines_to_spawn = chart_data.simlines.duplicate()
 	
-	seek_to_playback_time(conductor.get_playback_position())
+	if conductor:
+		seek_to_playback_time(conductor.get_playback_position())
 	set_process(true)
 	
 
+func _on_NoteSpeedSpinbox_value_changed(value):
+	base_note_screen_time = get_note_screen_time(value)
+	
+func get_note_screen_time(note_speed: float) -> float:
+	return (3 + (10-note_speed)) / note_speed

@@ -717,6 +717,7 @@ func reset_chart_data():
 	update_note_positions()
 	update_timingpoint_positions()
 	
+	emit_signal("reload_preview", self)
 	EditorStatus.set_saved()
 	EditorStatus.set_status("Ready")
 

@@ -19,6 +19,9 @@ func _ready():
 	$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(2, true)
 	
 	find_node("Game").set_conductor_node($SongAudioPlayer)
+	find_node("MusicVolumeSpinBox").share(find_node("PreviewMusicVolumeSpinBox"))
+	find_node("SFXVolumeSpinBox").share(find_node("PreviewSFXVolumeSpinBox"))
+	
 	EditorStatus.set_status("Ready")
 
 
@@ -102,6 +105,8 @@ func _on_OpenAudioDialog_file_selected(path):
 func _on_PlaySpeedOption_item_selected(index):
 	var speed_options = [0.25, 0.5, 0.75, 1.0]
 	$SongAudioPlayer.set_playback_speed(speed_options[index])
+	find_node("PlaySpeedOption").selected = index
+	find_node("PreviewPlaySpeedOption").selected = index
 	
 func load_audio(path: String) -> int:
 	var line_edit = find_node("AudioPathLineEdit")
@@ -134,6 +139,7 @@ func new_project():
 	$SongAudioPlayer.unload_audio()
 	$PanelContainer/VBoxContainer/TabContainer.set_current_tab(1)
 	$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(0, true)
+	$PanelContainer/VBoxContainer/TabContainer.set_tab_disabled(2, true)
 	chart_node.reset_chart_data()
 	
 	var line_edit = find_node("AudioPathLineEdit")
